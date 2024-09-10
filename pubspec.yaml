@@ -1,0 +1,121 @@
+name: recipe_food
+description: A new Flutter project.
+publish_to: none
+version: 1.0.0+1
+environment:
+    sdk: ^3.5.0
+dependencies:
+    flutter:
+        sdk: flutter
+    cupertino_icons: ^1.0.8
+    auto_route: ^9.2.1+1
+    hive: ^2.2.3
+    hive_flutter: ^1.1.0
+    uuid: ^4.4.2
+    riverpod: ^2.5.1
+    flutter_riverpod: ^2.5.1
+    hooks_riverpod: ^2.5.1
+    riverpod_annotation: ^2.3.5
+    freezed: ^2.5.7
+    freezed_annotation: ^2.4.4
+    json_annotation: ^4.9.0
+    path_provider: ^2.1.4
+    flutter_localizations:
+        sdk: flutter
+    intl: any
+    flutter_svg: ^2.0.10+1
+    flutter_keyboard_visibility: ^6.0.0
+    flutter_secure_storage: ^9.2.2
+    # animated_bottom_navigation_bar: ^1.3.3
+    auto_size_text: ^3.0.0
+    cached_network_image: ^3.4.1
+    connectivity_plus: ^6.0.5
+    fluttertoast: ^8.2.8
+    flutter_staggered_grid_view: ^0.7.0
+    extended_nested_scroll_view: ^6.2.1
+    loading_more_list: ^7.1.0
+    like_button: ^2.0.5
+    flutter_form_builder: ^9.4.1
+    form_builder_validators: ^11.0.0
+    form_builder_file_picker: ^4.2.0
+    flutter_dotenv: ^5.1.0
+    supabase_flutter: ^2.6.0
+    google_sign_in: ^6.2.1
+    flutter_facebook_auth: ^6.0.4
+    #* -------------
+    # like_button:
+    #     path: D:/GitHub/like_button/
+    #* ------------
+   
+dev_dependencies:
+    flutter_test:
+        sdk: flutter
+    flutter_lints: ^4.0.0
+    auto_route_generator: ^9.0.0
+    build_runner: ^2.4.12
+    flutter_gen_runner: ^5.6.0
+    hive_generator: ^2.0.1
+    riverpod_generator: ^2.4.2
+    json_serializable: ^6.8.0
+
+flutter_gen:
+  output: lib/gen/ # Optional (default: lib/gen/)
+  line_length: 80 # Optional (default: 80)
+
+  # Optional
+  integrations:
+    flutter_svg: true
+    flare_flutter: true
+    rive: true
+    lottie: true
+
+#   colors:
+#     inputs:
+#       - assets/color/colors.xml
+
+flutter:
+    uses-material-design: true
+    generate: true
+
+
+    # To add assets to your application, add an assets section, like this:
+    assets:
+        - assets/images/
+        - assets/svgs/
+        - .env
+    #  - images/a_dot_ham.jpeg
+        
+    # An image asset can refer to one or more resolution-specific "variants", see
+    # https://flutter.dev/assets-and-images/#resolution-aware.
+        
+    # For details regarding adding assets from package dependencies, see
+    # https://flutter.dev/assets-and-images/#from-packages
+        
+    # To add custom fonts to your application, add a fonts section here,
+    # in this "flutter" section. Each entry in this list should have a
+    # "family" key with the font family name, and a "fonts" key with a
+    # list giving the asset and other descriptors for the font. For
+    # example:
+
+    # fonts:
+    # - family: Chewy
+    #   fonts:
+    #     - asset: assets/fonts/Chewy/Chewy-Regular.ttf
+
+    fonts:
+    - family: Quicksand
+      fonts:
+        - asset: assets/fonts/Quicksand/static/Quicksand-Bold.ttf
+        - asset: assets/fonts/Quicksand/static/Quicksand-Light.ttf
+        - asset: assets/fonts/Quicksand/static/Quicksand-Medium.ttf
+        - asset: assets/fonts/Quicksand/static/Quicksand-Regular.ttf
+        - asset: assets/fonts/Quicksand/static/Quicksand-SemiBold.ttf
+        #   style: italic
+    #   - family: Trajan Pro
+    #     fonts:
+    #       - asset: fonts/TrajanPro.ttf
+    #       - asset: fonts/TrajanPro_Bold.ttf
+    #         weight: 700
+    #
+    # For details regarding fonts from package dependencies,
+    # see https://flutter.dev/custom-fonts/#from-packages

@@ -1,0 +1,10 @@
+{
+  "flutter": "3.24.0",
+  "flavors": {
+    "development": "beta",
+    "production": "3.24.0"
+  },
+  "updateVscodeSettings": true,
+  "updateGitIgnore": true,
+  "runPubGetOnSdkChanges": true
+}

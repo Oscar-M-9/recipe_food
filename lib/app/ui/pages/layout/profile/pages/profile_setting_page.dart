@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recipe_food/app/config/app_colors.dart';
+import 'package:recipe_food/app/presenter/providers/app/notification_provider.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 
 class ProfileSettingPage extends StatelessWidget {
@@ -55,6 +57,18 @@ class ProfileSettingPage extends StatelessWidget {
                   title: "Politica de privacidad",
                   onTap: () {},
                 ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final notificationsEnabled =
+                        ref.watch(notificationProvider);
+                    return Icon(
+                      notificationsEnabled
+                          ? Icons.notifications_active
+                          : Icons.notifications_off,
+                      size: 48,
+                    );
+                  },
+                )
               ],
             ),
           ),

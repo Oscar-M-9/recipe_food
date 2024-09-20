@@ -4,7 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:recipe_food/app/config/app_colors.dart';
 import 'package:recipe_food/app/config/language/index.dart';
 import 'package:recipe_food/app/config/router/router.gr.dart';
-import 'package:recipe_food/app/infra/models/onboarding_model.dart';
+import 'package:recipe_food/app/infra/models/onborading/onboarding_model.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 
 class AppScrollBehavior extends MaterialScrollBehavior {
@@ -103,9 +103,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
             itemBuilder: (context, index) {
               return Stack(
                 children: [
-                  SizedBox(
+                  Container(
                     width: double.infinity,
                     height: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Colors.black,
+                    ),
                     child: ShaderMask(
                       shaderCallback: (Rect bounds) {
                         return const LinearGradient(

@@ -11,6 +11,26 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:vector_graphics/vector_graphics.dart';
+import 'package:lottie/lottie.dart';
+
+class $AssetsIconsGen {
+  const $AssetsIconsGen();
+
+  /// File path: assets/icons/icon-chef-hat.png
+  AssetGenImage get iconChefHat =>
+      const AssetGenImage('assets/icons/icon-chef-hat.png');
+
+  /// File path: assets/icons/icon-chef-invert.png
+  AssetGenImage get iconChefInvert =>
+      const AssetGenImage('assets/icons/icon-chef-invert.png');
+
+  /// File path: assets/icons/icon-chef.png
+  AssetGenImage get iconChef =>
+      const AssetGenImage('assets/icons/icon-chef.png');
+
+  /// List of all assets
+  List<AssetGenImage> get values => [iconChefHat, iconChefInvert, iconChef];
+}
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
@@ -18,6 +38,10 @@ class $AssetsImagesGen {
   /// File path: assets/images/Icon Food Logo.png
   AssetGenImage get iconFoodLogo =>
       const AssetGenImage('assets/images/Icon Food Logo.png');
+
+  /// File path: assets/images/blank-profile-picture.png
+  AssetGenImage get blankProfilePicture =>
+      const AssetGenImage('assets/images/blank-profile-picture.png');
 
   /// File path: assets/images/onboarding-1.jpg
   AssetGenImage get onboarding1 =>
@@ -50,6 +74,7 @@ class $AssetsImagesGen {
   /// List of all assets
   List<AssetGenImage> get values => [
         iconFoodLogo,
+        blankProfilePicture,
         onboarding1,
         onboarding2,
         onboarding3,
@@ -58,6 +83,17 @@ class $AssetsImagesGen {
         onboarding6,
         placeholderImage
       ];
+}
+
+class $AssetsLottiesGen {
+  const $AssetsLottiesGen();
+
+  /// File path: assets/lotties/not-connetion.json
+  LottieGenImage get notConnetion =>
+      const LottieGenImage('assets/lotties/not-connetion.json');
+
+  /// List of all assets
+  List<LottieGenImage> get values => [notConnetion];
 }
 
 class $AssetsSvgsGen {
@@ -183,6 +219,10 @@ class $AssetsSvgsGen {
   SvgGenImage get moreHorizontal =>
       const SvgGenImage('assets/svgs/more-horizontal.svg');
 
+  /// File path: assets/svgs/network-wireless-offline.svg
+  SvgGenImage get networkWirelessOffline =>
+      const SvgGenImage('assets/svgs/network-wireless-offline.svg');
+
   /// File path: assets/svgs/notification-fill.svg
   SvgGenImage get notificationFill =>
       const SvgGenImage('assets/svgs/notification-fill.svg');
@@ -216,6 +256,9 @@ class $AssetsSvgsGen {
   /// File path: assets/svgs/secure-shield-password-protect-safe.svg
   SvgGenImage get secureShieldPasswordProtectSafe =>
       const SvgGenImage('assets/svgs/secure-shield-password-protect-safe.svg');
+
+  /// File path: assets/svgs/serve-alt.svg
+  SvgGenImage get serveAlt => const SvgGenImage('assets/svgs/serve-alt.svg');
 
   /// File path: assets/svgs/serve.svg
   SvgGenImage get serve => const SvgGenImage('assets/svgs/serve.svg');
@@ -275,6 +318,7 @@ class $AssetsSvgsGen {
         menu,
         messageAdd,
         moreHorizontal,
+        networkWirelessOffline,
         notificationFill,
         notification,
         notification2,
@@ -284,6 +328,7 @@ class $AssetsSvgsGen {
         recipeBook,
         removeSquare,
         secureShieldPasswordProtectSafe,
+        serveAlt,
         serve,
         settings04,
         share,
@@ -298,7 +343,9 @@ class Assets {
   Assets._();
 
   static const String aEnv = '.env';
+  static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
+  static const $AssetsLottiesGen lotties = $AssetsLottiesGen();
   static const $AssetsSvgsGen svgs = $AssetsSvgsGen();
 
   /// List of all assets
@@ -455,6 +502,69 @@ class SvgGenImage {
           (color == null ? null : ColorFilter.mode(color, colorBlendMode)),
       clipBehavior: clipBehavior,
       cacheColorFilter: cacheColorFilter,
+    );
+  }
+
+  String get path => _assetName;
+
+  String get keyName => _assetName;
+}
+
+class LottieGenImage {
+  const LottieGenImage(
+    this._assetName, {
+    this.flavors = const {},
+  });
+
+  final String _assetName;
+  final Set<String> flavors;
+
+  LottieBuilder lottie({
+    Animation<double>? controller,
+    bool? animate,
+    FrameRate? frameRate,
+    bool? repeat,
+    bool? reverse,
+    LottieDelegates? delegates,
+    LottieOptions? options,
+    void Function(LottieComposition)? onLoaded,
+    LottieImageProviderFactory? imageProviderFactory,
+    Key? key,
+    AssetBundle? bundle,
+    Widget Function(BuildContext, Widget, LottieComposition?)? frameBuilder,
+    ImageErrorWidgetBuilder? errorBuilder,
+    double? width,
+    double? height,
+    BoxFit? fit,
+    AlignmentGeometry? alignment,
+    String? package,
+    bool? addRepaintBoundary,
+    FilterQuality? filterQuality,
+    void Function(String)? onWarning,
+  }) {
+    return Lottie.asset(
+      _assetName,
+      controller: controller,
+      animate: animate,
+      frameRate: frameRate,
+      repeat: repeat,
+      reverse: reverse,
+      delegates: delegates,
+      options: options,
+      onLoaded: onLoaded,
+      imageProviderFactory: imageProviderFactory,
+      key: key,
+      bundle: bundle,
+      frameBuilder: frameBuilder,
+      errorBuilder: errorBuilder,
+      width: width,
+      height: height,
+      fit: fit,
+      alignment: alignment,
+      package: package,
+      addRepaintBoundary: addRepaintBoundary,
+      filterQuality: filterQuality,
+      onWarning: onWarning,
     );
   }
 

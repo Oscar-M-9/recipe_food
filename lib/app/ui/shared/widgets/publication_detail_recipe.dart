@@ -1,17 +1,52 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_food/app/config/app_colors.dart';
+import 'package:recipe_food/app/config/language/index.dart';
+import 'package:recipe_food/app/config/utils/utils.dart';
+import 'package:recipe_food/app/infra/models/others/user_stats.dart';
+import 'package:recipe_food/app/infra/models/recipe/recipe_model.dart';
+import 'package:recipe_food/app/presenter/services/profile/profile_service.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 
-class PublicationDetailRecipe extends StatelessWidget {
+class PublicationDetailRecipe extends StatefulWidget {
   const PublicationDetailRecipe({
     super.key,
     required this.keyImageHero,
+    required this.recipe,
+    this.isAuthor = true,
   });
 
   final String keyImageHero;
+  final RecipeModel recipe;
+  final bool isAuthor;
+
+  @override
+  State<PublicationDetailRecipe> createState() =>
+      _PublicationDetailRecipeState();
+}
+
+class _PublicationDetailRecipeState extends State<PublicationDetailRecipe> {
+  UserStats? _userStats;
+  final profileService = ProfileService();
+
+  @override
+  void initState() {
+    getUserFollowers();
+    super.initState();
+  }
+
+  void getUserFollowers() async {
+    final userStats =
+        await profileService.getUserStats(widget.recipe.user!.id!);
+    setState(() {
+      _userStats = userStats;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
@@ -20,78 +55,164 @@ class PublicationDetailRecipe extends StatelessWidget {
           child: Column(
             children: [
               // !! titulo
-              Text(
-                "How to make french toast ",
-                style: textTheme.headlineLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  widget.recipe.title ??
+                      AppLocalizations.of(context)!.textTitle,
+                  style: textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               const SizedBox(height: 15),
               // *!! imagen
               Hero(
-                tag: keyImageHero,
+                tag: widget.keyImageHero,
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 150),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Assets.images.onboarding1.image(
-                      fit: BoxFit.contain,
-                    ),
+                  constraints: const BoxConstraints(
+                    minHeight: 150,
+                    maxHeight: 300,
                   ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              // !! Creador
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: Assets.images.onboarding3.provider(),
-                  radius: 25,
-                ),
-                title: Text(
-                  "Roberta Anny",
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                subtitle: Text(
-                  "120K followers",
-                  style: textTheme.bodyMedium,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                trailing: ElevatedButton(
-                  onPressed: () {},
-                  style: ButtonStyle(
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
+                    height: 300,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        children: widget.recipe.images != null &&
+                                widget.recipe.images!.isNotEmpty
+                            ? widget.recipe.images!.map((e) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(5),
+                                    child: CachedNetworkImage(
+                                      imageUrl: e.image_url!,
+                                      fit: BoxFit.contain,
+                                      progressIndicatorBuilder:
+                                          (context, url, downloadProgress) =>
+                                              Center(
+                                        child: CircularProgressIndicator(
+                                            value: downloadProgress.progress),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                    ),
+                                  ),
+                                );
+                              }).toList()
+                            : [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: Assets.images.placeholderImage
+                                      .image(fit: BoxFit.cover),
+                                ),
+                              ],
                       ),
                     ),
                   ),
-                  child: Text(
-                    "Follow",
+                  // child: ClipRRect(
+                  //   borderRadius: BorderRadius.circular(15),
+                  //   child: widget.recipe.images!.isNotEmpty
+                  //       ? CachedNetworkImage(
+                  //           imageUrl: widget.recipe.images!.first.image_url!,
+                  //           fit: BoxFit.cover,
+                  //           progressIndicatorBuilder:
+                  //               (context, url, downloadProgress) => Center(
+                  //             child: SizedBox(
+                  //               width: 40,
+                  //               height: 40,
+                  //               child: CircularProgressIndicator(
+                  //                 value: downloadProgress.progress,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //           errorWidget: (context, url, error) => const Center(
+                  //             child: SizedBox(
+                  //               width: 40,
+                  //               height: 40,
+                  //               child: Icon(
+                  //                 Icons.error,
+                  //                 color: Colors.red,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         )
+                  //       : Assets.images.placeholderImage.image(
+                  //           fit: BoxFit.cover,
+                  //         ),
+                  // ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                child: Divider(
+                  color: AppColors.silver950.withOpacity(0.2),
+                ),
+              ),
+              // !! Creador
+              if (widget.isAuthor)
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: widget.recipe.user?.avatar_url != null
+                        ? CachedNetworkImageProvider(
+                            widget.recipe.user!.avatar_url!)
+                        : Assets.images.blankProfilePicture.provider(),
+                    radius: 25,
+                  ),
+                  title: Text(
+                    widget.recipe.user?.name ?? "-----",
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    "${AppUtils.formatLargeNumber(_userStats?.followersCount ?? 0)} ${AppLocalizations.of(context)!.textFollowers}",
+                    style: textTheme.bodyMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: ElevatedButton(
+                    onPressed: () {},
+                    style: ButtonStyle(
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)!.textFollow,
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
               const SizedBox(height: 15),
               // !! Dificultad de la receta
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Dificutad",
+                    AppLocalizations.of(context)!.textDifficulty,
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
-                    "Facil",
+                    AppUtils.getDifficultyText(
+                        context, widget.recipe.difficulty),
                     style: textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w500,
                       color: AppColors.silver950.withOpacity(0.5),
@@ -113,13 +234,13 @@ class PublicationDetailRecipe extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Ingredientes",
+                    AppLocalizations.of(context)!.textIngredients,
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
-                    "5 items",
+                    "${widget.recipe.ingredients?.length ?? 0} items",
                     style: textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w500,
                       color: AppColors.silver950.withOpacity(0.5),
@@ -130,7 +251,7 @@ class PublicationDetailRecipe extends StatelessWidget {
               const SizedBox(height: 12),
               // *lista de los ingredientes
               ...List.generate(
-                5,
+                widget.recipe.ingredients!.length,
                 (index) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
@@ -159,7 +280,7 @@ class PublicationDetailRecipe extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              "Milk",
+                              widget.recipe.ingredients![index].name ?? "----",
                               style: textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -168,9 +289,10 @@ class PublicationDetailRecipe extends StatelessWidget {
                             ),
                           ),
                           ConstrainedBox(
-                            constraints: BoxConstraints(maxWidth: 60),
+                            constraints: const BoxConstraints(maxWidth: 60),
                             child: Text(
-                              "200g",
+                              widget.recipe.ingredients![index].quantity ??
+                                  "00",
                               style: textTheme.bodyMedium?.copyWith(
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.silver950.withOpacity(0.5),
@@ -198,7 +320,7 @@ class PublicationDetailRecipe extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Pasos",
+                  AppLocalizations.of(context)!.textSteps,
                   style: textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -206,13 +328,26 @@ class PublicationDetailRecipe extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               ...List.generate(
-                5,
+                widget.recipe.steps!.length,
                 (index) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      "Lavar y secar las verduras. Pelar las zanahorias ligeramente si se desea con un pelaverduras. Desechar los extremos de ellas y del pimiento, y retirar los filamentos y semillas de este. Picar todo en trozos irregulares, no muy grandes, en un procesador de alimentos o picadora, o hacerlo a cuchillo.",
-                      style: textTheme.bodyLarge,
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "${AppLocalizations.of(context)!.textStep} ${widget.recipe.steps![index].step_number}",
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          widget.recipe.steps![index].step_detail ?? "----",
+                          style: textTheme.bodyLarge,
+                        ),
+                      ],
                     ),
                   );
                 },

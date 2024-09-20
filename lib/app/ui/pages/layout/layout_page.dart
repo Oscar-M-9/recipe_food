@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:recipe_food/app/config/language/index.dart';
 import 'package:recipe_food/app/config/router/router.gr.dart';
 import 'package:recipe_food/app/presenter/controllers/connectivity_controller.dart';
-import 'package:recipe_food/app/ui/pages/recipe/add_recipe_page.dart';
+import 'package:recipe_food/app/presenter/providers/app/profile/user_notifier.dart';
+import 'package:recipe_food/app/ui/pages/recipe/recipe_form_page.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 import 'package:recipe_food/app/config/app_colors.dart';
 
@@ -46,6 +48,31 @@ class LayoutPageState extends ConsumerState<LayoutPage> {
   ];
 
   @override
+  void initState() {
+    // Cargamos los datos del usuario solo la primera vez
+    ref.read(userProvider.notifier).loadUserData();
+    verifyPermissions();
+    super.initState();
+  }
+
+  void verifyPermissions() async {
+    await requestNotificationPermission(); // Solicitar el permiso aquí
+  }
+
+  Future<void> requestNotificationPermission() async {
+    if (await Permission.notification.isDenied) {
+      // Solicitar permiso si no ha sido otorgado
+      await Permission.notification.request();
+    }
+    if (await Permission.photos.isDenied) {
+      await Permission.photos.request();
+    }
+    if (await Permission.storage.isDenied) {
+      await Permission.storage.request();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final iconListName = [
@@ -66,7 +93,8 @@ class LayoutPageState extends ConsumerState<LayoutPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const AddRecipePage(),
+              // builder: (context) => const AddRecipePage(),
+              builder: (context) => RecipeFormPage(),
             ),
           );
           // context.router.push(AddRecipeRoute());
@@ -106,83 +134,9 @@ class LayoutPageState extends ConsumerState<LayoutPage> {
             ),
           ),
         );
-        // return BottomNavigationBar(
-        //   currentIndex: tabsRouter.activeIndex,
-        //   onTap: tabsRouter.setActiveIndex,
-        //   items: const [
-        //     BottomNavigationBarItem(
-        //         label: 'Users', icon: Icon(Icons.abc_outlined)),
-        //     BottomNavigationBarItem(
-        //         label: 'Posts', icon: Icon(Icons.abc_outlined)),
-        //     BottomNavigationBarItem(
-        //       label: 'Settings',
-        //       icon: Icon(Icons.abc_outlined),
-        //     ),
-        //     BottomNavigationBarItem(
-        //       label: 'Settings',
-        //       icon: Icon(Icons.abc_outlined),
-        //     ),
-        //   ],
-        // );
       },
     );
-
-    // return Scaffold(
-    //   body: IndexedStack(
-    //     index: _bottomNavIndex,
-    //     children: viewList,
-    //   ),
-    //   floatingActionButton: FloatingActionButton(
-    //     onPressed: () {
-    //       // Acción del FAB
-    //     },
-    //     backgroundColor: AppColors.visVis500,
-    //     tooltip: 'Chef',
-    //     shape: const CircleBorder(),
-    //     child: Assets.svgs.chefHat.svg(
-    //       color: Colors.white,
-    //       width: 28,
-    //     ),
-    //   ),
-    //   floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    //   extendBody: true,
-    //   bottomNavigationBar: _buildBottomNavigationBar(
-    //     context: context,
-    //     theme: theme,
-    //     iconListName: iconListName,
-    //   ),
-    // );
   }
-
-  // Widget _buildBottomNavigationBar({
-  //   required BuildContext context,
-  //   required ThemeData theme,
-  //   required List<String> iconListName,
-  // }) {
-  //   return ClipRRect(
-  //     borderRadius: const BorderRadiusDirectional.only(
-  //       topEnd: Radius.circular(15),
-  //       topStart: Radius.circular(15),
-  //     ),
-  //     child: BottomAppBar(
-  //       clipBehavior: Clip.antiAlias,
-  //       shape: const CircularNotchedRectangle(),
-  //       color: theme.bottomNavigationBarTheme.backgroundColor,
-  //       notchMargin: 10,
-  //       padding: EdgeInsets.zero,
-  //       elevation: 8,
-  //       shadowColor: theme.shadowColor.withOpacity(0.8),
-  //       child: Row(
-  //         children: _buildItems(
-  //           itemCount: iconListBottom.length,
-  //           theme: theme,
-  //           iconListName: iconListName,
-  //           bottomNavIndex: _bottomNavIndex,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   List<Widget> _buildItems({
     required int itemCount,

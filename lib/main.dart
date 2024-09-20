@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
-import 'package:recipe_food/app/config/app_colors.dart';
+
 import 'package:recipe_food/app/config/router/router.dart';
 import 'package:recipe_food/app/config/theme/app_theme.dart';
-import 'package:recipe_food/app/config/utils/constants.dart';
 
+import 'package:recipe_food/app/presenter/controllers/supabase_manager.dart';
 import 'package:recipe_food/app/presenter/controllers/hive_manager.dart';
 import 'package:recipe_food/app/presenter/providers/language/language_notifier.dart';
 
@@ -18,7 +18,12 @@ void main() async {
   await HiveManager.init();
 
   /// inicializamos el enviaroment .env
-  await EnvManager.init();
+  await dotenv.load(fileName: '.env');
+
+  /// inicializamos el Supabase
+  await SupabaseManager().init();
+
+  /// inicializamos flutter local notification
 
   runApp(
     const ProviderScope(
@@ -35,11 +40,12 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeProvider);
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        systemNavigationBarColor: AppColors.visVis500,
-      ),
-    );
+    // Cargamos los datos del usuario por primera vez
+    // SystemChrome.setSystemUIOverlayStyle(
+    //   const SystemUiOverlayStyle(
+    //     systemNavigationBarColor: AppColors.visVis400,
+    //   ),
+    // );
 
     return MaterialApp.router(
       title: 'Recetas Deliciosas',

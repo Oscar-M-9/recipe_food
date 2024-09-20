@@ -4,13 +4,38 @@ A new Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+````
+- const int notificationId = 1;
 
-A few resources to get you started if this is your first Flutter project:
+AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'progress_channel',
+      'Progress Notification',
+      channelDescription: 'Shows the progress of an ongoing task.',
+      importance: Importance.high,
+      priority: Priority.high,
+      onlyAlertOnce: true,
+      showProgress: true,
+      maxProgress: maxProgress,
+      indeterminate: false,
+      icon: 'drawable/ic_notification', 
+    );
+````
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+para la notificaion de carga al agregar una receta.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
+----
+
+````
+AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'completion_channel',
+      'Completion Notification',
+      channelDescription: 'Notifica cuando la tarea ha finalizado.',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: 'drawable/ic_notification',
+    );
+````

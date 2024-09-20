@@ -33,10 +33,14 @@ class AppRouter extends RootStackRouter {
           path: "/auth/sign-up",
         ),
         AutoRoute(
+          page: NotFoundRoute.page,
+          path: "/404",
+        ),
+        AutoRoute(
           page: LayoutRoute.page,
           path: "/",
           guards: [
-            InitialAuthGuard(), // Requiere autenticación para nevegar el home
+            AuthGuard(), // Requiere autenticación para nevegar el home
           ],
           children: [
             AutoRoute(page: HomeRoute.page, path: ""),
@@ -56,12 +60,16 @@ class AppRouter extends RootStackRouter {
               ],
             ),
             AutoRoute(page: SearchRoute.page, path: "search"),
-            AutoRoute(page: AddRecipeRoute.page, path: "add-recipe"),
+            AutoRoute(page: RecipeFormRoute.page, path: "add-recipe"),
             AutoRoute(page: NotificationRoute.page, path: "notification"),
             AutoRoute(
               page: ProfileRoute.page,
               path: "profile",
               children: [
+                AutoRoute(
+                  page: ProfileSettingRoute.page,
+                  path: "settings",
+                ),
                 AutoRoute(
                   page: AllRecipeRoute.page,
                   path: "all-recipe-view",

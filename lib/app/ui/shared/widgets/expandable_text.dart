@@ -23,24 +23,14 @@ class _ExpandableTextState extends State<ExpandableText> {
     final trimLength = widget.trimLength;
     final textTheme = Theme.of(context).textTheme;
 
+    // Asegúrate de que el trimLength no sea mayor que la longitud del texto
+    final displayText = text.length > trimLength && !isExpanded
+        ? '${text.substring(0, trimLength)}...'
+        : text;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Text(
-        //   isExpanded ? text : '${text.substring(0, trimLength)}...',
-        //   style: textTheme.bodyMedium,
-        // ),
-        // GestureDetector(
-        //   onTap: () {
-        //     setState(() {
-        //       isExpanded = !isExpanded;
-        //     });
-        //   },
-        //   child: Text(
-        //     isExpanded ? 'Ver menos' : 'Ver más',
-        //     style: TextStyle(color: Colors.blue),
-        //   ),
-        // ),
         GestureDetector(
           onTap: () {
             setState(() {
@@ -49,22 +39,23 @@ class _ExpandableTextState extends State<ExpandableText> {
           },
           child: RichText(
             text: TextSpan(
-              text: isExpanded ? text : '${text.substring(0, trimLength)}...',
+              text: displayText,
               style: textTheme.bodySmall?.copyWith(
                 fontSize: 13,
               ),
               children: <TextSpan>[
-                TextSpan(
-                  text: isExpanded ? '' : 'Ver más',
-                  style: textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: textTheme.bodyMedium?.color?.withOpacity(0.8),
+                if (!isExpanded && text.length > trimLength)
+                  TextSpan(
+                    text: ' Ver más',
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: textTheme.bodyMedium?.color?.withOpacity(0.8),
+                    ),
                   ),
-                ),
               ],
             ),
           ),
-        )
+        ),
       ],
     );
   }

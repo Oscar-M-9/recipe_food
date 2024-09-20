@@ -1,8 +1,11 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 // import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:recipe_food/app/config/app_colors.dart';
+import 'package:recipe_food/app/config/language/index.dart';
 import 'package:recipe_food/app/ui/shared/inputs/custom_input.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 
@@ -27,7 +30,7 @@ class NewTextFieldStep extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Instrucción',
+              AppLocalizations.of(context)!.textInstructions,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
@@ -50,10 +53,10 @@ class NewTextFieldStep extends StatelessWidget {
               FormBuilderTextField(
                 name: stepName,
                 maxLines: null,
-                keyboardType: TextInputType.text,
+                keyboardType: TextInputType.multiline,
                 decoration: CustomInput.buildInputDecoration(
                   context,
-                  hintText: "Escribir",
+                  hintText: AppLocalizations.of(context)!.textWrite,
                   radius: 5,
                 ),
                 validator: FormBuilderValidators.compose([

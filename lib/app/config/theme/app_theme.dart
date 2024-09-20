@@ -13,9 +13,10 @@ class AppTheme {
         scrolledUnderElevation: 0.0,
         backgroundColor: Colors.white,
       ),
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.visVis700,
+      colorScheme: const ColorScheme.light(
         brightness: Brightness.light,
+        primary: AppColors.visVis500,
+        // onSurface: Colors.green,
       ),
       useMaterial3: true,
       checkboxTheme: CheckboxThemeData(
@@ -53,8 +54,8 @@ class AppTheme {
         color: Colors.black,
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        circularTrackColor: AppColors.visVis300,
-        color: AppColors.visVis500,
+        circularTrackColor: Colors.transparent,
+        color: AppColors.visVis400,
       ),
       inputDecorationTheme: const InputDecorationTheme(
         fillColor: Colors.white,
@@ -72,8 +73,9 @@ class AppTheme {
         scrolledUnderElevation: 0.0,
         backgroundColor: Colors.black,
       ),
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.visVis700,
+      colorScheme: const ColorScheme.dark(
+        // seedColor: AppColors.visVis700,
+        primary: AppColors.visVis500,
         brightness: Brightness.dark,
       ),
       checkboxTheme: CheckboxThemeData(
@@ -111,8 +113,8 @@ class AppTheme {
         color: Colors.white,
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        circularTrackColor: AppColors.visVis500,
-        color: AppColors.visVis600,
+        circularTrackColor: Colors.transparent,
+        color: AppColors.visVis500,
       ),
       inputDecorationTheme: const InputDecorationTheme(
         fillColor: AppColors.silver950,

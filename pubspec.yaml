@@ -11,7 +11,7 @@ dependencies:
     auto_route: ^9.2.1+1
     hive: ^2.2.3
     hive_flutter: ^1.1.0
-    uuid: ^4.4.2
+    uuid: ^4.5.0
     riverpod: ^2.5.1
     flutter_riverpod: ^2.5.1
     hooks_riverpod: ^2.5.1
@@ -47,6 +47,14 @@ dependencies:
     flutter_timezone: ^3.0.1
     image: ^4.2.0
     lottie: ^3.1.2
+    flutter_launcher_icons: ^0.13.1
+    flutter_native_splash: ^2.4.1
+    # image_picker: ^1.1.2
+    file_picker: ^8.1.2
+    flutter_plugin_android_lifecycle: ^2.0.22
+    permission_handler: ^11.3.1
+    shimmer: ^3.0.0
+    # flutter_quill: ^10.5.14
     #* -------------
     # like_button:
     #     path: D:/GitHub/like_button/
@@ -86,6 +94,7 @@ flutter:
     # To add assets to your application, add an assets section, like this:
     assets:
         - assets/images/
+        - assets/icons/
         - assets/svgs/
         - assets/lotties/
         - .env

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_food/app/config/app_colors.dart';
+import 'package:recipe_food/app/infra/models/user/user_model.dart';
 import 'package:recipe_food/app/ui/pages/layout/profile/widgets/profile_button.dart';
 
 class ProfileInfo extends StatelessWidget {
-  const ProfileInfo({super.key});
+  const ProfileInfo({
+    super.key,
+    this.user,
+  });
+  final UserModel? user;
 
   @override
   Widget build(BuildContext context) {
@@ -14,27 +19,10 @@ class ProfileInfo extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 5),
-          // Text(
-          //   'Carol Gilliam',
-          //   style: textTheme.titleLarge?.copyWith(
-          //     fontWeight: FontWeight.w800,
-          //     height: 1.2,
-          //   ),
-          //   // style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-          // ),
-          // Text(
-          //   '@carol_gilliam',
-          //   // style: TextStyle(color: Colors.grey[600], fontSize: 16),
-          //   style: textTheme.titleMedium?.copyWith(
-          //     color: AppColors.silver700,
-          //     fontWeight: FontWeight.w600,
-          //     // height: 1.2,
-          //   ),
-          // ),
           Row(
             children: [
               Text(
-                'Carol Gilliam ',
+                user?.name != null ? user!.name! : "User",
                 style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                   height: 1.2,
@@ -46,7 +34,7 @@ class ProfileInfo extends StatelessWidget {
             ],
           ),
           Text(
-            'Active and happy mom of three sons. The best recipes for you and your family every day 🥑🌮',
+            user?.description != null ? user!.description! : "",
             // textAlign: TextAlign.center,
             style: textTheme.bodyMedium?.copyWith(
               color: AppColors.silver800,

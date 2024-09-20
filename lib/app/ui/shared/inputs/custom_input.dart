@@ -8,6 +8,7 @@ class CustomInput {
     String? labelText,
     double radius = 20,
     EdgeInsetsGeometry? contentPadding,
+    Color? fillColor,
   }) {
     return InputDecoration(
       contentPadding: contentPadding ??
@@ -16,7 +17,7 @@ class CustomInput {
       labelText: labelText,
       hintStyle: Theme.of(context).textTheme.bodyMedium,
       filled: true,
-      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+      fillColor: fillColor ?? Theme.of(context).inputDecorationTheme.fillColor,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radius),
         borderSide: const BorderSide(

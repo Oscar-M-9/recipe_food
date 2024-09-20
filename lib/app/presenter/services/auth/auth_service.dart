@@ -1,15 +1,18 @@
-// import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
-import 'package:recipe_food/app/config/router/router.gr.dart';
+import 'package:recipe_food/app/presenter/controllers/supabase_manager.dart';
+import 'package:recipe_food/app/presenter/services/profile/profile_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
   final Box hiveBox = Hive.box('setting');
+  final Box hiveBoxUser = Hive.box('user');
   // Get a reference your Supabase client
-  final SupabaseClient supabase = Supabase.instance.client;
+  final SupabaseClient supabase = SupabaseManager().client;
+  final profileService = ProfileService();
 
   // ? Iniciar sesion por correo electronico y contraseña
   Future<AuthResponse?> signInWithEmail(String email, String password) async {
@@ -18,9 +21,11 @@ class AuthService {
         email: email,
         password: password,
       );
+      hiveBox.put("onboarding", false);
+      await profileService.getUserData();
       return response;
     } on AuthException catch (e) {
-      print("Error en autenticación:  ${e.message}");
+      debugPrint("Error en autenticación:  ${e.message}");
       return null;
     }
   }
@@ -37,20 +42,10 @@ class AuthService {
         email: email,
         password: password,
       );
-      // final response2 = await supabase.auth.admin.createUser(
-      //   AdminUserAttributes(
-      //     email: email,
-      //     password: password,
-      //     emailConfirm: false,
-      //   ),
-      // );
-      print("response: $response");
       // Accediendo a a información del usuario
       final user = response.user;
-      print("user : $user");
       // Generar el username único
       final username = await generateUniqueUsername(nameUser);
-      print("username : $username");
 
       if (user != null) {
         // Insertar datos en la tabla users
@@ -62,44 +57,21 @@ class AuthService {
           "terms_and_conditions": acceptTerms,
         });
       }
-      // Accediendo a la sesión
-      final session = response.session;
-      print("sesion : $session");
-      if (session != null) {
-        final accessToken = session.accessToken;
-        final refreshToken = session.refreshToken;
-        hiveBox.put("accessToken", accessToken);
-        hiveBox.put("refreshToken", refreshToken);
-        print("Access Token: $accessToken");
-        print("Refresh Token: $refreshToken");
-      }
-
+      hiveBox.put("onboarding", false);
+      await profileService.getUserData();
       return response;
     } on AuthException catch (e) {
-      print("Error en registro: ${e.message}");
+      debugPrint("Error en registro: ${e.message}");
       return null;
     }
   }
 
-  // ? Iniciar seesión con Google
+  // ? Iniciar sessión con Google
   Future<AuthResponse?> signInWithGoogle() async {
     try {
-      /// TODO: update the Web client ID with your own.
-      ///
-      /// Web Client ID that you registered with Google Cloud.
-      const webClientId =
-          '766543360584-k8r3t7d3u4t91pos3n7krdedhb0h1ho5.apps.googleusercontent.com';
+      debugPrint("------------Autenticando con google -------------");
 
-      // /// iOS Client ID that you registered with Google Cloud.
-      // const iosClientId = 'my-ios.apps.googleusercontent.com';
-
-      // Google sign in on Android will work without providing the Android
-      // Client ID registered on Google Cloud.
-
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        // clientId: iosClientId,
-        serverClientId: webClientId,
-      );
+      final GoogleSignIn googleSignIn = _getGoogleSignInInstance();
       final googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
@@ -126,51 +98,101 @@ class AuthService {
       // Accediendo a la información del usuario
       final user = response.user;
       // Generar el username único
-      final username = await generateUniqueUsername(googleUser.displayName!);
 
       if (user != null) {
-        // 2. Insertar el usuario en la tabla 'users'
-        await supabase.from('users').upsert({
-          'auth_id': user.id,
-          'email': googleUser.email,
-          'name': googleUser.displayName,
-          'username': username,
-          'avatar_url': googleUser.photoUrl,
-          "terms_and_conditions": true,
-        });
+        final existingUser = await supabase
+            .from('users')
+            .select()
+            .eq('auth_id', user.id)
+            .maybeSingle();
+
+        if (existingUser == null) {
+          // Inserta al nuevo usuario solo si no existe
+          final username =
+              await generateUniqueUsername(googleUser.displayName!);
+          await supabase.from('users').insert({
+            'auth_id': user.id,
+            'email': googleUser.email,
+            'name': googleUser.displayName,
+            'username': username,
+            'avatar_url': googleUser.photoUrl,
+            "terms_and_conditions": true,
+          });
+        }
       }
-      // Accediendo a la sesión
-      final session = response.session;
-      if (session != null) {
-        final accessToken = session.accessToken;
-        final refreshToken = session.refreshToken;
-        hiveBox.put("accessToken", accessToken);
-        hiveBox.put("refreshToken", refreshToken);
-        print("Access Token: $accessToken");
-        print("Refresh Token: $refreshToken");
-      }
+      hiveBox.put("onboarding", false);
+      await profileService.getUserData();
 
       return response;
     } on AuthException catch (e) {
-      print('Error de autenticación en Google: ${e.message}');
+      debugPrint('Error de autenticación en Google: ${e.message}');
       return null;
     } catch (e) {
-      print('Error desconocido: $e');
+      debugPrint('Error desconocido: $e');
       return null;
     }
   }
 
+  // Cerrar sesión
+  Future<void> signOut() async {
+    final user = supabase.auth.currentUser;
+
+    if (user != null) {
+      // Obtener el proveedor de autenticación desde el app_metadata
+      final String? provider = user.appMetadata['provider'];
+
+      if (provider == 'google') {
+        debugPrint('El usuario inició sesión con Google');
+        await signOutGoogleAndSupabase();
+      } else if (provider == 'email') {
+        debugPrint('El usuario inició sesión con email');
+        await supabase.auth.signOut();
+      } else {
+        debugPrint('El usuario inició sesión con otro proveedor: $provider');
+      }
+    } else {
+      debugPrint('No hay ningún usuario autenticado');
+    }
+  }
+
+  Future<void> signOutGoogleAndSupabase() async {
+    try {
+      final GoogleSignIn googleSignIn = _getGoogleSignInInstance();
+      // Cierra sesión de Google
+      await googleSignIn.signOut();
+      debugPrint('Sesión cerrada de Google');
+
+      // Cierra sesión en Supabase
+      await Supabase.instance.client.auth.signOut();
+      debugPrint('Sesión cerrada de Supabase');
+    } catch (error) {
+      debugPrint('Error cerrando sesión: $error');
+    }
+  }
+
+// Instancia de GoogleSignIn para evitar duplicación de código
+  GoogleSignIn _getGoogleSignInInstance() {
+    // Web Client ID that you registered with Google Cloud.
+    const webClientId =
+        '766543360584-k8r3t7d3u4t91pos3n7krdedhb0h1ho5.apps.googleusercontent.com';
+
+    //  iOS Client ID that you registered with Google Cloud.
+    // const iosClientId = 'my-ios.apps.googleusercontent.com';
+
+    // Google sign in on Android will work without providing the Android
+    // Client ID registered on Google Cloud.
+
+    return GoogleSignIn(
+      serverClientId: webClientId,
+    );
+  }
+
   //**** */ gen del username
   Future<String> generateUniqueUsername(String name) async {
-    // 1. Remover las tildes y convertir el nombre a minúsculas y reemplazar espacios por guiones bajos
-    String baseUsername =
-        _removeDiacritics(name.toLowerCase()).replaceAll(' ', '_');
-    print("baseUsername: $baseUsername");
-
+    // 1. Generar el url
+    String finalUsername = generarUrl(name);
     // 2. Verificar si ya existe en la base de datos
-    String finalUsername = baseUsername;
     bool isUsernameTaken = await _isUsernameTaken(finalUsername);
-    print("isUsernameTaken: $isUsernameTaken");
 
     // 3. Si el nombre ya existe, agregar un número aleatorio
     while (isUsernameTaken) {
@@ -178,25 +200,21 @@ class AuthService {
       final random = Random();
       final randomNumber =
           random.nextInt(9999) + 1; // Generar un número de 1 a 9999
-      finalUsername = '$baseUsername$randomNumber';
+      finalUsername = '$finalUsername$randomNumber';
 
       // Volver a verificar si este nuevo username existe
       isUsernameTaken = await _isUsernameTaken(finalUsername);
     }
-    print("finalUsername: $finalUsername");
     return finalUsername;
   }
 
-  // Función para remover las tildes
-  String _removeDiacritics(String str) {
-    const withDiacritics = 'áéíóúÁÉÍÓÚ';
-    const withoutDiacritics = 'aeiouAEIOU';
-
-    for (int i = 0; i < withDiacritics.length; i++) {
-      str = str.replaceAll(withDiacritics[i], withoutDiacritics[i]);
-    }
-
-    return str;
+  String generarUrl(String texto) {
+    return texto
+        .toLowerCase() // Convertir a minúsculas
+        .replaceAll(RegExp(r'\s+(?!$)'),
+            '_') // Reemplazar espacios por guiones bajos, excepto si es el último caracter
+        .replaceAll(
+            RegExp(r'[^a-z0-9_@.-]'), ''); // Eliminar caracteres no permitidos
   }
 
   Future<bool> _isUsernameTaken(String username) async {
@@ -212,7 +230,7 @@ class AuthService {
     }
 
     // Si la respuesta no es null, significa que el username está tomado
-    print("username is taken: true => ${response == null}");
+    debugPrint("username is taken:  => $response");
     return true;
   }
 
@@ -225,20 +243,4 @@ class AuthService {
 
     return response != null;
   }
-
-  // // listen de la autenticacion en supabase
-  // void setupAuthListener(context) {
-  //   supabase.auth.onAuthStateChange.listen((data) {
-  //     final event = data.event;
-  //     if (event == AuthChangeEvent.signedIn ||
-  //         event == AuthChangeEvent.initialSession) {
-  //       context.router.pushAndPopUntil(
-  //         const LayoutRoute(),
-  //         predicate: (route) => false,
-  //       );
-  //     }else if (event == AuthChangeEvent.signedOut){
-  //       context.router.
-  //     }
-  //   });
-  // }
 }

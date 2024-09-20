@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:recipe_food/app/config/language/index.dart';
 import 'package:recipe_food/app/ui/shared/inputs/custom_input.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 
@@ -32,7 +33,7 @@ class NewTextFieldIngredient extends StatelessWidget {
               name: ingredientName,
               decoration: CustomInput.buildInputDecoration(
                 context,
-                hintText: "Ingredient Name",
+                hintText: AppLocalizations.of(context)!.textIngredientName,
                 radius: 10,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -50,7 +51,7 @@ class NewTextFieldIngredient extends StatelessWidget {
               name: ingredientQuantity,
               decoration: CustomInput.buildInputDecoration(
                 context,
-                hintText: "Quantity",
+                hintText: AppLocalizations.of(context)!.textQuantity,
                 radius: 10,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 10,

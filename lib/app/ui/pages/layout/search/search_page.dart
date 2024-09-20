@@ -4,13 +4,13 @@ import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_more_list/loading_more_list.dart';
 import 'package:recipe_food/app/config/app_colors.dart';
 import 'package:recipe_food/app/config/language/index.dart';
+import 'package:recipe_food/app/infra/models/recipe/recipe_model.dart';
+import 'package:recipe_food/app/infra/models/user/user_model.dart';
 import 'package:recipe_food/app/ui/pages/layout/home/widgets/divider_vertical.dart';
 import 'package:recipe_food/app/ui/pages/layout/home/widgets/icon_text.dart';
 import 'package:recipe_food/app/ui/shared/widgets/story.dart';
-import 'package:recipe_food/app/ui/shared/widgets/expandable_text.dart';
 import 'package:recipe_food/app/ui/shared/inputs/custom_input.dart';
 import 'package:recipe_food/app/ui/shared/widgets/publication_recipe.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
@@ -506,6 +506,8 @@ class _SearchPageState extends State<SearchPage> {
               itemBuilder: (context, index) {
                 return PublicationRecipe(
                   keyImageHero: "image_search_$index",
+                  recipe: RecipeModel(),
+                  user: UserModel(),
                 );
               },
             ),

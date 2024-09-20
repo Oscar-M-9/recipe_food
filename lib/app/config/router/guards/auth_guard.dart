@@ -1,65 +1,131 @@
-import 'package:hive/hive.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:recipe_food/app/config/router/router.gr.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:recipe_food/app/presenter/controllers/supabase_manager.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthGuard extends AutoRouteGuard {
   final Box hiveBox = Hive.box('setting');
-  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   @override
   Future<void> onNavigation(
       NavigationResolver resolver, StackRouter router) async {
-    final token = await _getToken();
-    print("Token encontrado: $token");
+    final connectivityResult = await Connectivity().checkConnectivity();
+    final bool isOnboarding = hiveBox.get("onboarding") ?? true;
 
-    if (token != null && !_isTokenExpired(token)) {
-      print("💚 usuario autenticado");
-      resolver.next(true); // Usuario autenticado, continuar a Home
+    if (connectivityResult.first == ConnectivityResult.mobile ||
+        connectivityResult.first == ConnectivityResult.ethernet ||
+        connectivityResult.first == ConnectivityResult.wifi) {
+      final SupabaseClient supabase = SupabaseManager().client;
+
+      final session = supabase.auth.currentSession;
+      final token = session?.accessToken;
+
+      if (token != null) {
+        debugPrint("🎇 Token válido, redirigiendo...");
+        resolver.next(true); // Token válido, continuar a la siguiente pantalla
+      } else {
+        if (isOnboarding) {
+          debugPrint("🎆 No hay token, redirigiendo a Onboarding");
+          router.replaceAll([const OnboardingRoute()]);
+        } else {
+          debugPrint("🎆 Usuario no autenticado o sesión cerrada");
+          router.replaceAll([const SignInRoute()]);
+        }
+      }
     } else {
-      print("Usuario no autenticado, redirigiendo a Onboarding");
-      // Redirigir al Onboarding y cancelar la navegación actual
-      router.replaceAll([const OnboardingRoute()]);
-
-      // router.pushAndPopUntil(const OnboardingRoute(),
-      //     predicate: (_) => false); // Redirigir a Login
+      debugPrint(
+          "🚫 No hay conexión a Internet, redirigiendo a página de error");
+      router.replaceAll([const NotFoundRoute()]);
     }
-  }
-
-  Future<String?> _getToken() async {
-    // Verificar en Hive o SecureStorage
-    final token = hiveBox.get('accessToken');
-    if (token != null) {
-      return token;
-    }
-
-    final secureToken = await secureStorage.read(key: 'accessToken');
-    return secureToken;
-  }
-
-  bool _isTokenExpired(String token) {
-    // Lógica para verificar si el token ha expirado (puedes usar JWT o cualquier otro método)
-    // Retorna true si ha expirado, false si es válido
-    // Ejemplo simple con un timestamp de expiración:
-    // final expiryDate = DateTime.parse(tokenExpiryDate);
-    // return DateTime.now().isAfter(expiryDate);
-    return false; // Solo como placeholder
   }
 }
 
 
-// class AuthGuard extends AutoRouteGuard {
-//   @override
-//   void onNavigation(NavigationResolver resolver, StackRouter router) async {
-//     // the navigation is paused until resolver.next() is called with either
-//     // true to resume/continue navigation or false to abort navigation
-//     const isAuthenticated = false; // await _authService.isAuthenticated();
 
-//     // ignore: dead_code
-//     if (isAuthenticated) {
-//       resolver.redirect(const HomeRoute());
+// import 'package:auto_route/auto_route.dart';
+// import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:hive/hive.dart';
+// import 'package:recipe_food/app/config/router/router.gr.dart';
+// import 'package:recipe_food/app/presenter/controllers/supabase_manager.dart';
+// import 'package:supabase_flutter/supabase_flutter.dart';
+
+// class AuthGuard extends AutoRouteGuard {
+//   final Box hiveBox = Hive.box('setting');
+
+//   @override
+//   Future<void> onNavigation(
+//       NavigationResolver resolver, StackRouter router) async {
+//     final connectivityResult = await Connectivity().checkConnectivity();
+//     final bool isOnboarding = hiveBox.get("onboarding") ?? true;
+//     print("🎃| $isOnboarding");
+//     if (connectivityResult.first == ConnectivityResult.mobile ||
+//         connectivityResult.first == ConnectivityResult.ethernet ||
+//         connectivityResult.first == ConnectivityResult.wifi) {
+//       //
+//       final SupabaseClient supabase = SupabaseManager().client;
+//       supabase.auth.onAuthStateChange.listen((data) async {
+//         final event = data.event;
+//         final token = data.session?.accessToken;
+//         print("🎇🎆🎈1 $token");
+//         // print("🎇🎆🎈3 ${data.session!.expiresAt}");
+
+//         if (token != null) {
+//           print("aquii----");
+//           if (event == AuthChangeEvent.signedIn ||
+//               event == AuthChangeEvent.initialSession ||
+//               event == AuthChangeEvent.tokenRefreshed) {
+//             print("aquii222----");
+//             // Lógica para verificar la expiración del token
+//             // final payload = _decodeToken(token);
+//             // final int? timestampUnix = data.session!.expiresAt;
+//             // final DateTime expirationTime = DateTime.fromMillisecondsSinceEpoch(
+//             //   timestampUnix! * 1000,
+//             //   isUtc: true,
+//             // );
+//             // final timeDifference =
+//             //     expirationTime.difference(DateTime.now().toUtc());
+//             // print("expire time: $expirationTime");
+//             // print("time diference: $timeDifference");
+//             // print("date utc : ${DateTime.now().toUtc()}");
+
+//             // if (timeDifference.inMinutes < 5) {
+//             //   // Verificar la conexión antes de refrescar el token
+
+//             //   if (connectivityResult.first != ConnectivityResult.none) {
+//             //     try {
+//             //       // Hay conexión a internet, refrescar token
+//             //       print("Se va a refrescar el token");
+//             //       await supabase.auth.refreshSession();
+//             //     } on SocketException catch (e) {
+//             //       // Manejar el error de conexión
+//             //       print("Error de conexión: $e");
+//             //       // Mostrar un mensaje de error al usuario
+//             //     } catch (e) {
+//             //       print("🎉 $e");
+//             //     }
+//             //   } else {
+//             //     // No hay conexión a internet, manejar el error
+//             //     print("Sin conexión a internet");
+//             //   }
+//             // }
+
+//             resolver.next(true); // Token válido, continuar a Home
+//           }
+//         } else if (event == AuthChangeEvent.signedOut || !isOnboarding) {
+//           print("🎆 signed out");
+//           router.replaceAll([const SignInRoute()]);
+//         } else {
+//           // Token expirado o no autenticado, redirigir a Onboarding
+//           print("🎆 not token");
+//           router.replaceAll([const OnboardingRoute()]);
+//         }
+//       });
+//     } else {
+//       print("no fount en el guard");
+//       router.replaceAll([const NotFoundRoute()]);
 //     }
-//     // if user is authenticated we continue
-//     resolver.redirect(const OnboardingRoute());
 //   }
 // }

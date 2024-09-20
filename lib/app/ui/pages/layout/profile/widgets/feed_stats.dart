@@ -1,6 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:recipe_food/app/config/utils/format_large_number.dart';
+import 'package:recipe_food/app/config/utils/utils.dart';
 
 class FeedStats extends StatelessWidget {
   const FeedStats({
@@ -18,7 +18,7 @@ class FeedStats extends StatelessWidget {
     return Column(
       children: [
         Text(
-          formatLargeNumber(number),
+          AppUtils.formatLargeNumber(number),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: textTheme.titleMedium?.copyWith(

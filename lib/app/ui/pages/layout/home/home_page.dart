@@ -5,7 +5,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:recipe_food/app/config/app_colors.dart';
 import 'package:recipe_food/app/config/language/index.dart';
 import 'package:recipe_food/app/config/router/router.gr.dart';
-import 'package:recipe_food/gen/assets.gen.dart';
 
 @RoutePage()
 class HomePage extends StatefulWidget {
@@ -29,13 +28,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final tabs = <String>[
       AppLocalizations.of(context)!.textRecipesForYou,
-      AppLocalizations.of(context)!.textFollowingChefs,
-      // Puedes agregar más tabs aquí si es necesario
+      // AppLocalizations.of(context)!.textFollowingChefs,
     ];
     final tabNotify = <bool>[
       false,
-      true,
-      // Puedes agregar más tabs aquí si es necesario
+      // true,
     ];
     final double statusBarHeight = MediaQuery.of(context).padding.top;
     final double pinnedHeaderHeight =
@@ -49,9 +46,7 @@ class _HomePageState extends State<HomePage> {
       curve: Curves.bounceInOut,
       routes: const [
         RecipesForYouRoute(),
-        FollowingChefsRoute(),
-        // AllRecipeRoute(activeIndex: 0),
-        // AllFavoriteRoute(activeIndex: 1),
+        // FollowingChefsRoute(),
       ],
       builder: (context, child, pageController) {
         final tabsRouter = AutoTabsRouter.of(context);
@@ -69,16 +64,6 @@ class _HomePageState extends State<HomePage> {
                   elevation: 4,
                   shadowColor: Theme.of(context).shadowColor.withOpacity(0.6),
                   title: Container(
-                    // margin: EdgeInsets.only(top: statusBarHeight),
-                    // decoration: BoxDecoration(
-                    //   boxShadow: [
-                    //     BoxShadow(
-                    //       color: Theme.of(context).shadowColor.withOpacity(0.6),
-                    //       blurRadius: 3.0,
-                    //       offset: const Offset(0.0, 5.0),
-                    //     ),
-                    //   ],
-                    // ),
                     alignment: AlignmentDirectional.center,
                     height: 43,
                     child: Stack(
@@ -101,7 +86,6 @@ class _HomePageState extends State<HomePage> {
                               tabNotify: tabNotify,
                               // onTap: tabsRouter.setActiveIndex,
                               onTap: (index) {
-                                print(index);
                                 tabsRouter.setActiveIndex(index);
                               },
                             ),
@@ -133,197 +117,8 @@ class _HomePageState extends State<HomePage> {
             },
             onlyOneScrollInBody: true,
             body: child,
-            // body: CustomScrollView(
-            //   slivers: [
-            //     SliverFillRemaining(
-            //       child: ClipRRect(
-            //         borderRadius: BorderRadius.circular(20),
-            //         child: child,
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            // body: Column(
-            //   children: [
-            //     // Container(
-            //     //   margin: EdgeInsets.only(top: statusBarHeight),
-            //     //   decoration: BoxDecoration(
-            //     //     boxShadow: [
-            //     //       BoxShadow(
-            //     //         color: Theme.of(context).shadowColor.withOpacity(0.6),
-            //     //         blurRadius: 3.0,
-            //     //         offset: const Offset(0.0, 5.0),
-            //     //       ),
-            //     //     ],
-            //     //   ),
-            //     //   alignment: AlignmentDirectional.center,
-            //     //   height: 43,
-            //     //   child: Stack(
-            //     //     children: [
-            //     //       // tab text
-            //     //       Container(
-            //     //         padding: const EdgeInsets.symmetric(horizontal: 5),
-            //     //         // decoration: BoxDecoration(
-            //     //         //   color: Theme.of(context).cardColor.withOpacity(0.9),
-            //     //         //   borderRadius: BorderRadius.circular(15),
-            //     //         // ),
-            //     //         child: Row(
-            //     //           mainAxisSize: MainAxisSize.min,
-            //     //           mainAxisAlignment: MainAxisAlignment.center,
-            //     //           crossAxisAlignment: CrossAxisAlignment.center,
-            //     //           children: _buildTabItems(
-            //     //             activeIndex: tabsRouter.activeIndex,
-            //     //             tabs: tabs,
-            //     //             width: tabWidth,
-            //     //             tabNotify: tabNotify,
-            //     //             // onTap: tabsRouter.setActiveIndex,
-            //     //             onTap: (index) {
-            //     //               print(index);
-            //     //               tabsRouter.setActiveIndex(index);
-            //     //             },
-            //     //           ),
-            //     //         ),
-            //     //       ),
-            //     //       // Indicator
-            //     //       AnimatedPositioned(
-            //     //         duration: const Duration(milliseconds: 300),
-            //     //         curve: Curves.easeInOut,
-            //     //         left: indicatorLeft,
-            //     //         bottom: 2,
-            //     //         child: Container(
-            //     //           width: indicatorSize,
-            //     //           height: 4,
-            //     //           decoration: BoxDecoration(
-            //     //             color: AppColors.visVis500,
-            //     //             borderRadius: BorderRadius.circular(10),
-            //     //           ),
-            //     //         ),
-            //     //       ),
-            //     //     ],
-            //     //   ),
-            //     // ),
-            //     Expanded(
-            //       child: ClipRRect(
-            //         borderRadius: BorderRadius.circular(20),
-            //         child: child,
-            //       ),
-            //     ),
-            //   ],
-            // ),
           ),
         );
-
-        // return SafeArea(
-        //   bottom: false,
-        //   child: Stack(
-        //     children: [
-        //       Column(
-        //         children: [
-        //           // TabBar View (Pages)
-        //           Expanded(
-        //             child: Padding(
-        //               padding: const EdgeInsets.symmetric(horizontal: 5),
-        //               child: child,
-        //               // child: PageView(
-        //               //   controller: _pageController,
-        //               //   onPageChanged: (index) {
-        //               //     setState(() {
-        //               //       _currentIndex = index;
-        //               //     });
-        //               //   },
-        //               //   children: pages,
-        //               // ),
-        //             ),
-        //           ),
-        //         ],
-        //       ),
-        //       Stack(
-        //         children: [
-        //           Container(
-        //             width: double.infinity,
-        //             padding: const EdgeInsets.only(bottom: 2),
-        //             decoration: BoxDecoration(
-        //               color: Theme.of(context)
-        //                   .scaffoldBackgroundColor
-        //                   .withOpacity(0.8),
-        //               boxShadow: [
-        //                 BoxShadow(
-        //                   color: Theme.of(context).shadowColor.withOpacity(0.6),
-        //                   blurRadius: 3.0,
-        //                   offset: const Offset(0.0, 1.0),
-        //                 ),
-        //               ],
-        //             ),
-        //             alignment: AlignmentDirectional.center,
-        //             height: 43,
-        //             child: Stack(
-        //               children: [
-        //                 // tab text
-        //                 Container(
-        //                   padding: const EdgeInsets.symmetric(horizontal: 5),
-        //                   // decoration: BoxDecoration(
-        //                   //   color: Theme.of(context).cardColor.withOpacity(0.9),
-        //                   //   borderRadius: BorderRadius.circular(15),
-        //                   // ),
-        //                   child: Row(
-        //                     mainAxisSize: MainAxisSize.min,
-        //                     mainAxisAlignment: MainAxisAlignment.center,
-        //                     crossAxisAlignment: CrossAxisAlignment.center,
-        //                     children: _buildTabItems(
-        //                       activeIndex: tabsRouter.activeIndex,
-        //                       tabs: tabs,
-        //                       width: tabWidth,
-        //                       tabNotify: tabNotify,
-        //                       // onTap: tabsRouter.setActiveIndex,
-        //                       onTap: (index) {
-        //                         print(index);
-        //                         tabsRouter.setActiveIndex(index);
-        //                         pageController.animateToPage(
-        //                           index,
-        //                           duration: const Duration(
-        //                               milliseconds:
-        //                                   500), // Cambia la duración aquí
-        //                           curve: Curves
-        //                               .elasticInOut, // Cambia la curva aquí
-        //                         );
-        //                       },
-        //                     ),
-        //                   ),
-        //                 ),
-        //                 // Indicator
-        //                 AnimatedPositioned(
-        //                   duration: const Duration(milliseconds: 300),
-        //                   curve: Curves.easeInOut,
-        //                   left: indicatorLeft,
-        //                   bottom: 0,
-        //                   child: Container(
-        //                     width: indicatorSize,
-        //                     height: 4,
-        //                     decoration: BoxDecoration(
-        //                       color: AppColors.visVis500,
-        //                       borderRadius: BorderRadius.circular(10),
-        //                     ),
-        //                   ),
-        //                 ),
-        //               ],
-        //             ),
-        //           ),
-        //           // Positioned(
-        //           //   right: 2,
-        //           //   top: 0,
-        //           //   child: IconButton(
-        //           //     onPressed: () {},
-        //           //     icon: Assets.svgs.iconSearch.svg(
-        //           //       // ignore: deprecated_member_use_from_same_package
-        //           //       color: Theme.of(context).iconTheme.color,
-        //           //     ),
-        //           //   ),
-        //           // ),
-        //         ],
-        //       ),
-        //     ],
-        //   ),
-        // );
       },
     );
   }

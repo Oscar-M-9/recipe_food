@@ -1,13 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:recipe_food/app/config/app_colors.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:recipe_food/app/config/language/index.dart';
+import 'package:recipe_food/app/infra/models/others/user_stats.dart';
+import 'package:recipe_food/app/infra/models/user/user_model.dart';
+import 'package:recipe_food/app/presenter/services/profile/profile_service.dart';
 import 'package:recipe_food/app/ui/pages/layout/home/widgets/divider_vertical.dart';
 import 'package:recipe_food/app/ui/pages/layout/profile/widgets/feed_stats.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 
-class ProfileAvatar extends StatelessWidget {
+class ProfileAvatar extends ConsumerStatefulWidget {
   const ProfileAvatar({
     super.key,
+    this.user,
   });
+
+  final UserModel? user;
+
+  @override
+  ProfileAvatarState createState() => ProfileAvatarState();
+}
+
+class ProfileAvatarState extends ConsumerState<ProfileAvatar> {
+  final profileService = ProfileService();
+  UserStats? _userStats;
+  // int followerCount = 0;
+  // int followingCount = 0;
+  // int recipeCount = 0;
+
+  @override
+  void initState() {
+    getUserFollowers();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void getUserFollowers() async {
+    var box = await Hive.openBox('user');
+    var user = box.get('user') as UserModel;
+
+    final userStats = await profileService.getUserStats(user.id!);
+    setState(() {
+      _userStats = userStats;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,52 +74,18 @@ class ProfileAvatar extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            AppColors.visVis500,
-                            AppColors.visVis300,
-                            AppColors.jade300,
-                            AppColors.jade600,
-                            // Colors.purple,
-                            // Colors.blue,
-                            // Colors.green,
-                            // Colors.yellow,
-                            // Colors.orange,
-                            // Colors.red,
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                             color: theme.scaffoldBackgroundColor,
                             shape: BoxShape.circle),
                         child: CircleAvatar(
+                          backgroundColor: Colors.transparent,
                           radius: 42,
-                          backgroundImage: Assets.images.onboarding1.provider(),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 13,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.jade500,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: theme.scaffoldBackgroundColor,
-                            width: 3,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.add_rounded,
-                          color: Colors.white,
-                          size: 20,
+                          backgroundImage: widget.user?.avatar_url != null
+                              ? CachedNetworkImageProvider(
+                                  widget.user!.avatar_url!)
+                              : Assets.images.blankProfilePicture.provider(),
                         ),
                       ),
                     ),
@@ -86,34 +93,31 @@ class ProfileAvatar extends StatelessWidget {
                 ),
               ),
             ),
-            const Expanded(
+            // cuenta de las estadisdicas del usuario
+            Expanded(
               flex: 2,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         FeedStats(
-                          text: "Recipes",
-                          number: 580,
+                          text: AppLocalizations.of(context)!.textRecipes,
+                          number: _userStats?.recipesCount ?? 0,
                         ),
-                        DividerVertical(
-                          height: 25,
-                        ),
+                        const DividerVertical(height: 25),
                         FeedStats(
-                          text: "Following",
-                          number: 8900,
+                          text: AppLocalizations.of(context)!.textFollowing,
+                          number: _userStats?.followingCount ?? 0,
                         ),
-                        DividerVertical(
-                          height: 25,
-                        ),
+                        const DividerVertical(height: 25),
                         FeedStats(
-                          text: "Followers",
-                          number: 109000,
+                          text: AppLocalizations.of(context)!.textFollowers,
+                          number: _userStats?.followersCount ?? 0,
                         ),
                       ],
                     ),
@@ -121,47 +125,6 @@ class ProfileAvatar extends StatelessWidget {
                 ),
               ),
             ),
-            // Expanded(
-            //   flex: 2,
-            //   child: Container(
-            //     color: Colors.pink.withOpacity(0.44),
-            //     child: Padding(
-            //       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            //       child: Column(
-            //         mainAxisAlignment: MainAxisAlignment.start,
-            //         crossAxisAlignment: CrossAxisAlignment.start,
-            //         children: [
-            //           Text(
-            //             'Carol Gilliam',
-            //             style: theme.textTheme.titleLarge?.copyWith(
-            //               fontWeight: FontWeight.w800,
-            //               height: 1.2,
-            //             ),
-            //             // style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-            //           ),
-            //           Text(
-            //             '@carol_gilliam',
-            //             // style: TextStyle(color: Colors.grey[600], fontSize: 16),
-            //             style: theme.textTheme.titleMedium?.copyWith(
-            //               color: AppColors.silver700,
-            //               fontWeight: FontWeight.w600,
-            //               height: 1.2,
-            //             ),
-            //           ),
-            //           const SizedBox(height: 10),
-            //           Text(
-            //             'Active and happy mom of three sons. The best recipes for you and your family every day 🥑🌮',
-            //             textAlign: TextAlign.center,
-            //             style: textTheme.bodyMedium?.copyWith(
-            //               color: AppColors.silver800,
-            //             ),
-            //             // style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-            //           ),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),

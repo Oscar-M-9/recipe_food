@@ -1,14 +1,18 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:recipe_food/app/config/language/index.dart';
+import 'package:recipe_food/app/presenter/providers/app/profile/user_notifier.dart';
+import 'package:recipe_food/app/presenter/services/profile/profile_service.dart';
 import 'package:recipe_food/app/ui/pages/layout/profile/pages/profile_setting_page.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:recipe_food/app/config/app_colors.dart';
 import 'package:recipe_food/app/config/router/router.gr.dart';
-import 'package:recipe_food/app/presenter/providers/app/profile_tabs_provider.dart';
 import 'package:recipe_food/app/ui/pages/layout/profile/widgets/profile_avatar.dart';
 import 'package:recipe_food/app/ui/pages/layout/profile/widgets/profile_info.dart';
 
@@ -23,11 +27,10 @@ class ProfilePage extends ConsumerStatefulWidget {
 class ProfilePageState extends ConsumerState<ProfilePage> {
   final PageStorageBucket _bucket = PageStorageBucket();
   final ScrollController _nestedScrollController = ScrollController();
+  final GlobalKey<ExtendedNestedScrollViewState> _key =
+      GlobalKey<ExtendedNestedScrollViewState>();
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  final profileService = ProfileService();
 
   @override
   void dispose() {
@@ -44,38 +47,32 @@ class ProfilePageState extends ConsumerState<ProfilePage> {
         AllFavoriteRoute(),
       ],
       builder: (context, child, tabController) {
-        final tabsRouter = context.tabsRouter;
-        tabController.addListener(
-          () {
-            ref.read(indexTabs.notifier).state = tabsRouter.activeIndex;
-          },
-        );
-        // print('Active Index2: ${tabsRouter.activeIndex}');
-
         final double statusBarHeight = MediaQuery.of(context).padding.top;
         final double pinnedHeaderHeight =
             //statusBar height
             statusBarHeight +
                 //pinned SliverAppBar height in header
                 kToolbarHeight;
+        final user = ref.watch(userProvider);
 
         return Scaffold(
           body: ExtendedNestedScrollView(
+            key: _key,
             controller: _nestedScrollController,
+            onlyOneScrollInBody: true,
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
                 SliverAppBar(
-                  pinned: true,
-                  floating: true,
                   title: Text(
-                    '@carol_gilliam',
+                    user != null ? '@${user.username}' : '@username',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: AppColors.silver900,
                       fontWeight: FontWeight.w600,
-                      // height: 1.2,
                     ),
                   ),
                   centerTitle: true,
+                  pinned: true,
+                  floating: true,
                   actions: [
                     // IconButton(
                     //   onPressed: () {},
@@ -118,68 +115,17 @@ class ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                   ],
                 ),
-                const SliverToBoxAdapter(child: ProfileAvatar()),
-                const SliverToBoxAdapter(child: ProfileInfo()),
-                // PinnedHeaderSliver(
-                //   child: Container(
-                //     margin:
-                //         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                //     decoration: BoxDecoration(
-                //       color: theme.cardColor.withOpacity(0.95),
-                //       borderRadius: BorderRadius.circular(10),
-                //     ),
-                //     child: TabBar(
-                //       controller: tabController,
-                //       dividerColor: Colors.transparent,
-                //       indicatorSize: TabBarIndicatorSize.label,
-                //       // indicatorColor: AppColors.visVis500,
-                //       indicatorPadding: const EdgeInsetsDirectional.only(
-                //         top: 38.5,
-                //         bottom: 5,
-                //         start: 35,
-                //         end: 35,
-                //       ),
-                //       indicator: BoxDecoration(
-                //         borderRadius: BorderRadius.circular(10),
-                //         gradient: const LinearGradient(
-                //           colors: [
-                //             AppColors.visVis500,
-                //             AppColors.visVis400,
-                //             AppColors.visVis300,
-                //             AppColors.jade300,
-                //             AppColors.jade400,
-                //             AppColors.jade500,
-                //           ],
-                //         ),
-                //       ),
-                //       tabs: [
-                //         Tab(
-                //           // text: 'Recipes',
-                //           // icon: Assets.svgs.menu2.svg(
-                //           //   height: 20,
-                //           // ),
-                //           child: _buildTabItem(
-                //             text: "Recipes",
-                //             icon: Assets.svgs.menu2,
-                //           ),
-                //         ),
-                //         Tab(
-                //           // text: 'Favorites',
-                //           child: _buildTabItem(
-                //             text: "Favorites",
-                //             icon: Assets.svgs.iconFavorite,
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // )
+                SliverToBoxAdapter(
+                  child: ProfileAvatar(
+                    user: user,
+                  ),
+                ),
+                SliverToBoxAdapter(child: ProfileInfo(user: user)),
               ];
             },
             pinnedHeaderSliverHeightBuilder: () {
               return pinnedHeaderHeight;
             },
-            onlyOneScrollInBody: true,
             body: Column(
               children: [
                 Container(
@@ -215,19 +161,14 @@ class ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                     tabs: [
                       Tab(
-                        // text: 'Recipes',
-                        // icon: Assets.svgs.menu2.svg(
-                        //   height: 20,
-                        // ),
                         child: _buildTabItem(
-                          text: "Recipes",
+                          text: AppLocalizations.of(context)!.textRecipes,
                           icon: Assets.svgs.menu2,
                         ),
                       ),
                       Tab(
-                        // text: 'Favorites',
                         child: _buildTabItem(
-                          text: "Colecciones",
+                          text: AppLocalizations.of(context)!.textCollections,
                           icon: Assets.svgs.bookmark,
                         ),
                       ),

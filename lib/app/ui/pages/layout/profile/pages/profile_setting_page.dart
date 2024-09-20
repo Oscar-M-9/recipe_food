@@ -1,11 +1,79 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recipe_food/app/config/app_colors.dart';
+import 'package:recipe_food/app/config/language/index.dart';
+import 'package:recipe_food/app/config/router/router.gr.dart';
+import 'package:recipe_food/app/presenter/controllers/connectivity_controller.dart';
 import 'package:recipe_food/app/presenter/providers/app/notification_provider.dart';
+import 'package:recipe_food/app/presenter/services/auth/auth_service.dart';
+import 'package:recipe_food/app/ui/shared/widgets/custom_toast.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 
-class ProfileSettingPage extends StatelessWidget {
+@RoutePage()
+class ProfileSettingPage extends ConsumerStatefulWidget {
   const ProfileSettingPage({super.key});
+
+  @override
+  ProfileSettingPageState createState() => ProfileSettingPageState();
+}
+
+class ProfileSettingPageState extends ConsumerState<ProfileSettingPage> {
+  late FToast fToast;
+  final authService = AuthService();
+
+  @override
+  void initState() {
+    fToast = FToast();
+    fToast.init(context);
+    super.initState();
+  }
+
+  void signOut() async {
+    final connectivityNotifier = ref.read(connectivityStatusProvider.notifier);
+    final isConnected = await connectivityNotifier.isConnected;
+
+    if (!isConnected && mounted) {
+      _showToast(
+        text: AppLocalizations.of(context)!.textNoInternetConnection,
+      );
+      return;
+    }
+
+    try {
+      await authService.signOut();
+      if (mounted) {
+        context.router.replaceAll([const LayoutRoute()]);
+      }
+    } catch (e) {
+      // Manejar el error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.radicalRed500,
+            content: Text(
+              e.toString(), // Convertir a String
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  _showToast({required String text}) {
+    Widget toast = CustomToast(text: text);
+
+    fToast.showToast(
+      child: toast,
+      gravity: ToastGravity.TOP,
+      toastDuration: const Duration(seconds: 2),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +106,38 @@ class ProfileSettingPage extends StatelessWidget {
                     height: 22,
                   ),
                   title: "Logout",
-                  onTap: () {},
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Cerrar sesion"),
+                          content: Text("esta seguro en cerrar sesion?"),
+                          actions: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.maybePop(context);
+                                    },
+                                    child: Text("cancetar"),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: MaterialButton(
+                                    color: AppColors.radicalRed400,
+                                    onPressed: signOut,
+                                    child: Text("cerrar Sesion"),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        );
+                      },
+                    );
+                  },
                 ),
                 Padding(
                   padding:

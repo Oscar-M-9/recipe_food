@@ -14,6 +14,7 @@ import 'package:recipe_food/app/presenter/services/auth/auth_service.dart';
 import 'package:recipe_food/app/ui/shared/widgets/custom_toast.dart';
 import 'package:recipe_food/app/ui/shared/widgets/text_field_custom.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 @RoutePage()
 class SignUpPage extends ConsumerStatefulWidget {
@@ -56,13 +57,11 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
           _isLoading = true;
         });
         final formData = _formKey.currentState!.value;
-        print('Form data: $formData'); // Aquí se imprimen los datos
         final String email = formData[_nameEmail];
         final String password = formData[_namePassword];
         final String nameUser = formData[_nameNameUser];
         final bool acceptTerms = formData[_nameAcceptTerms];
         final bool isEmailTaken = await _authService.isEmailTaken(email);
-        print("🛺 $isEmailTaken");
         setState(() {
           _isLoading = false;
         });
@@ -83,18 +82,18 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
             );
           }
         } else {
-          await _authService.signUpWithEmail(
+          final AuthResponse? response = await _authService.signUpWithEmail(
             email,
             password,
             nameUser,
             acceptTerms,
           );
-          if (mounted) {
+          if (mounted && response != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 backgroundColor: AppColors.jade500,
                 content: Text(
-                  AppLocalizations.of(context)!.textAlreadyHaveAccountSignIn,
+                  AppLocalizations.of(context)!.textWelcomeToRecetasDeliciosas,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -102,10 +101,7 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
                 ),
               ),
             );
-            context.router.pushAndPopUntil(
-              const LayoutRoute(),
-              predicate: (route) => false,
-            );
+            context.router.replaceAll([const LayoutRoute()]);
           }
         }
       }
@@ -191,6 +187,7 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
                         name: _nameEmail,
                         hintText:
                             AppLocalizations.of(context)?.labelEmailAddress,
+                        keyboardType: TextInputType.emailAddress,
                         prefixIcon: Container(
                           width: 40,
                           alignment: Alignment.center,
@@ -256,19 +253,18 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              _isLoading
-                                  ? Container(
-                                      height: 22,
-                                      width: 22,
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                      ),
-                                      child: const CircularProgressIndicator(
-                                        backgroundColor: AppColors.silver100,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const SizedBox(),
+                              if (_isLoading)
+                                Container(
+                                  height: 22,
+                                  width: 22,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: const CircularProgressIndicator(
+                                    backgroundColor: Colors.transparent,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               Text(
                                 AppLocalizations.of(context)!.labelContinue,
                                 style: textTheme.bodyLarge?.copyWith(

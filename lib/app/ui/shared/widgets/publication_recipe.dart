@@ -1,8 +1,15 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:like_button/like_button.dart';
+import 'package:recipe_food/app/config/language/index.dart';
+import 'package:recipe_food/app/config/utils/utils.dart';
+import 'package:recipe_food/app/infra/models/recipe/recipe_model.dart';
+import 'package:recipe_food/app/infra/models/user/user_model.dart';
+import 'package:recipe_food/app/presenter/services/recipe/recipe_service.dart';
 import 'package:recipe_food/app/ui/pages/layout/home/widgets/divider_vertical.dart';
 import 'package:recipe_food/app/ui/pages/layout/home/widgets/icon_text.dart';
 import 'package:recipe_food/app/ui/shared/widgets/expandable_text.dart';
@@ -13,15 +20,27 @@ class PublicationRecipe extends StatelessWidget {
   const PublicationRecipe({
     super.key,
     required this.keyImageHero,
+    required this.recipe,
+    required this.user,
   });
   final String keyImageHero;
+  final RecipeModel recipe;
+  final UserModel user;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     Future<bool> onLikeButtonTapped(bool isLiked) async {
+      final recipeService = RecipeService();
+      var box = await Hive.openBox('user');
+      var user = box.get('user') as UserModel;
+
       /// send your request here
-      // final bool success= await sendRequest();
+      if (!isLiked) {
+        await recipeService.likeRecipe(recipe.id!, user.id!);
+      } else {
+        await recipeService.unLikeRecipe(recipe.id!, user.id!);
+      }
 
       /// if failed, you can do nothing
       // return success? !isLiked:isLiked;
@@ -43,7 +62,9 @@ class PublicationRecipe extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                backgroundImage: Assets.images.onboarding3.provider(),
+                backgroundImage: recipe.user?.avatar_url != null
+                    ? CachedNetworkImageProvider(recipe.user!.avatar_url!)
+                    : Assets.images.blankProfilePicture.provider(),
                 radius: 16,
               ),
               const SizedBox(width: 8),
@@ -52,7 +73,7 @@ class PublicationRecipe extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AutoSizeText(
-                      "By Roberta Anny",
+                      recipe.user?.name ?? "-----",
                       style: theme.textTheme.titleSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -70,24 +91,10 @@ class PublicationRecipe extends StatelessWidget {
                 onPressed: () {
                   // opcion guardar y denunciar como en instagram
                 },
-                icon: Icon(Icons.more_vert_rounded),
+                icon: const Icon(Icons.more_vert_rounded),
               ),
             ],
           ),
-          // // titulo de la receta
-          // const SizedBox(height: 2),
-          // Align(
-          //   alignment: Alignment.centerLeft,
-          //   child: Text(
-          //     "How to make french toast",
-          //     style: theme.textTheme.titleMedium?.copyWith(
-          //       fontWeight: FontWeight.w600,
-          //       height: 1.12,
-          //     ),
-          //     maxLines: 2,
-          //     overflow: TextOverflow.ellipsis,
-          //   ),
-          // ),
 
           const SizedBox(height: 8),
           // imagen y titulo de la receta
@@ -98,6 +105,7 @@ class PublicationRecipe extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => PublicationDetailRecipe(
                     keyImageHero: keyImageHero,
+                    recipe: recipe,
                   ),
                 ),
               );
@@ -108,12 +116,38 @@ class PublicationRecipe extends StatelessWidget {
                 Hero(
                   tag: keyImageHero,
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 150),
+                    constraints: const BoxConstraints(minHeight: 200),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(5),
-                      child: Assets.images.onboarding1.image(
-                        fit: BoxFit.contain,
-                      ),
+                      child: recipe.images!.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: recipe.images!.first.image_url!,
+                              fit: BoxFit.contain,
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) => Center(
+                                child: SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: CircularProgressIndicator(
+                                    value: downloadProgress.progress,
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Center(
+                                child: SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: Icon(
+                                    Icons.error,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Assets.images.placeholderImage.image(
+                              fit: BoxFit.contain,
+                            ),
                     ),
                   ),
                 ),
@@ -132,12 +166,15 @@ class PublicationRecipe extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 10),
-                          child: AutoSizeText(
-                            "Almond & Orange Blossom French Crepes",
-                            maxLines: 2,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              height: 1.15,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: AutoSizeText(
+                              recipe.title ?? "-----",
+                              maxLines: 2,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                height: 1.15,
+                              ),
                             ),
                           ),
                         ),
@@ -146,18 +183,25 @@ class PublicationRecipe extends StatelessWidget {
                           children: [
                             IconText(
                               svgPath: Assets.svgs.time.path,
-                              text: "30 min",
+                              text: "${recipe.cooking_time ?? 00} min",
                             ),
                             const DividerVertical(),
                             IconText(
-                              svgPath: Assets.svgs.foodEasy.path,
-                              text: "Easy",
+                              svgPath: AppUtils.getDifficultySvgPath(
+                                  recipe.difficulty),
+                              text: AppUtils.getDifficultyText(
+                                  context, recipe.difficulty),
                             ),
+
                             const DividerVertical(),
                             IconText(
-                              svgPath: Assets.svgs.fire.path,
-                              text: "320 Cal",
+                              svgPath: Assets.svgs.serveAlt.path,
+                              text: "${recipe.servings ?? 00}",
                             ),
+                            // IconText(
+                            //   svgPath: Assets.svgs.fire.path,
+                            //   text: "320 Cal",
+                            // ),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -170,15 +214,14 @@ class PublicationRecipe extends StatelessWidget {
           ),
           // alguna descripcion
           const SizedBox(height: 6),
-          const Align(
+          Align(
             alignment: Alignment.centerLeft,
             child: ExpandableText(
-              text:
-                  'Este es un texto muy largo que se mostrará en forma resumida inicialmente. Si el usuario hace clic en "Ver más", se mostrará todo el contenido.',
-              trimLength: 50,
+              text: recipe.short_description ?? "",
+              trimLength: (MediaQuery.of(context).size.width * 0.6).toInt(),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 15),
           // like , comment , share and save options
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -187,9 +230,14 @@ class PublicationRecipe extends StatelessWidget {
               // like -> me gustas
               LikeButton(
                 // size: 40.0,
-                likeCount: 999,
+                likeCount: recipe.like?.length ?? 0,
                 key: GlobalKey<LikeButtonState>(),
-                isLiked: false,
+                isLiked: recipe.like
+                        ?.map(
+                          (e) => e.user_id,
+                        )
+                        .contains(user.id!) ??
+                    false,
                 // postFrameCallback: (LikeButtonState state) {
                 //   state.controller?.forward();
                 // },
@@ -206,25 +254,27 @@ class PublicationRecipe extends StatelessWidget {
                     return Center(
                       child: Assets.svgs.iconFavoriteFill.svg(
                         height: 24,
-                        color: isLiked ? Colors.pinkAccent : Colors.grey,
+                        color:
+                            isLiked ? Colors.pinkAccent : theme.iconTheme.color,
                       ),
                     );
                   } else {
                     return Center(
                       child: Assets.svgs.iconFavorite.svg(
                         height: 24,
-                        color: isLiked ? Colors.pinkAccent : Colors.grey,
+                        color:
+                            isLiked ? Colors.pinkAccent : theme.iconTheme.color,
                       ),
                     );
                   }
                 },
                 countBuilder: (int? count, bool isLiked, String text) {
-                  final ColorSwatch<int> color =
-                      isLiked ? Colors.pinkAccent : Colors.grey;
+                  final Color? color =
+                      isLiked ? Colors.pinkAccent : theme.iconTheme.color;
                   Widget result;
                   if (count == 0) {
                     result = Text(
-                      'love',
+                      AppLocalizations.of(context)!.textLike,
                       style: TextStyle(color: color),
                     );
                   } else {

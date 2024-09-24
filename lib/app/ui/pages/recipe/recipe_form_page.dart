@@ -12,7 +12,7 @@ import 'package:recipe_food/app/infra/models/recipe/preparation_steps/preparatio
 import 'package:recipe_food/app/infra/models/recipe/recipe_image/recipe_image_model.dart';
 import 'package:recipe_food/app/infra/models/recipe/recipe_model.dart';
 import 'package:recipe_food/app/presenter/providers/app/profile/user_notifier.dart';
-import 'package:recipe_food/app/presenter/services/recipe/recipe_service.dart';
+import 'package:recipe_food/app/presenter/services/recipe/add_recipe_service.dart';
 import 'package:recipe_food/app/ui/pages/recipe/steps/step_1.dart';
 import 'package:recipe_food/app/ui/pages/recipe/steps/step_2.dart';
 import 'package:recipe_food/app/ui/pages/recipe/steps/step_3.dart';
@@ -239,7 +239,7 @@ class RecipeFormPageState extends ConsumerState<RecipeFormPage> {
         ));
       }
 
-      RecipeService().addRecipe(
+      AddRecipeService().addRecipe(
         images: images,
         recipe: recipe,
         categorie: categorie,

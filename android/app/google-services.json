@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "297728338814",
+    "project_id": "recetas-deliciosas-ee2f8",
+    "storage_bucket": "recetas-deliciosas-ee2f8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:297728338814:android:48ee3a8a06ee3109d2612f",
+        "android_client_info": {
+          "package_name": "com.delicious_recipes.recipe_food"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC63T0rVaW0awu9N4yti4eeGFt78wxo1q0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:297728338814:android:c49c251c60379522d2612f",
+        "android_client_info": {
+          "package_name": "com.delicious_recipes.recipe_food"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC63T0rVaW0awu9N4yti4eeGFt78wxo1q0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

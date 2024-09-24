@@ -3,8 +3,10 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
+import 'package:recipe_food/app/config/utils/constants.dart';
 import 'package:recipe_food/app/presenter/controllers/supabase_manager.dart';
 import 'package:recipe_food/app/presenter/services/profile/profile_service.dart';
+import 'package:recipe_food/app/presenter/services/user_device/user_devices_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
@@ -22,7 +24,8 @@ class AuthService {
         password: password,
       );
       hiveBox.put("onboarding", false);
-      await profileService.getUserData();
+      final user = await profileService.getUserData();
+      await UserDevicesService().saveDeviceToSupabase(userId: user!.id!);
       return response;
     } on AuthException catch (e) {
       debugPrint("Error en autenticación:  ${e.message}");
@@ -58,7 +61,8 @@ class AuthService {
         });
       }
       hiveBox.put("onboarding", false);
-      await profileService.getUserData();
+      final userModel = await profileService.getUserData();
+      await UserDevicesService().saveDeviceToSupabase(userId: userModel!.id!);
       return response;
     } on AuthException catch (e) {
       debugPrint("Error en registro: ${e.message}");
@@ -121,7 +125,8 @@ class AuthService {
         }
       }
       hiveBox.put("onboarding", false);
-      await profileService.getUserData();
+      final userModel = await profileService.getUserData();
+      await UserDevicesService().saveDeviceToSupabase(userId: userModel!.id!);
 
       return response;
     } on AuthException catch (e) {
@@ -143,9 +148,11 @@ class AuthService {
 
       if (provider == 'google') {
         debugPrint('El usuario inició sesión con Google');
+        await UserDevicesService().removeFcmTokenFromDevice();
         await signOutGoogleAndSupabase();
       } else if (provider == 'email') {
         debugPrint('El usuario inició sesión con email');
+        await UserDevicesService().removeFcmTokenFromDevice();
         await supabase.auth.signOut();
       } else {
         debugPrint('El usuario inició sesión con otro proveedor: $provider');
@@ -173,8 +180,7 @@ class AuthService {
 // Instancia de GoogleSignIn para evitar duplicación de código
   GoogleSignIn _getGoogleSignInInstance() {
     // Web Client ID that you registered with Google Cloud.
-    const webClientId =
-        '766543360584-k8r3t7d3u4t91pos3n7krdedhb0h1ho5.apps.googleusercontent.com';
+    var webClientId = Constants.googleWebClientId;
 
     //  iOS Client ID that you registered with Google Cloud.
     // const iosClientId = 'my-ios.apps.googleusercontent.com';
@@ -184,6 +190,17 @@ class AuthService {
 
     return GoogleSignIn(
       serverClientId: webClientId,
+      scopes: [
+        'email',
+        // Auth  userinfo email, profile
+        'profile',
+        // Auth userinfo profile, email
+        'openid',
+        // Auth userinfo profile, email
+        'https://www.googleapis.com/auth/userinfo.email',
+        // Auth userinfo profile, email
+        'https://www.googleapis.com/auth/userinfo.profile',
+      ],
     );
   }
 

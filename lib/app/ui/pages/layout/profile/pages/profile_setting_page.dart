@@ -1,12 +1,16 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:recipe_food/app/config/app_colors.dart';
 import 'package:recipe_food/app/config/language/index.dart';
 import 'package:recipe_food/app/config/router/router.gr.dart';
 import 'package:recipe_food/app/presenter/controllers/connectivity_controller.dart';
+import 'package:recipe_food/app/presenter/controllers/notification/notification_controller.dart';
 import 'package:recipe_food/app/presenter/providers/app/notification_provider.dart';
+import 'package:recipe_food/app/presenter/providers/app/profile/user_notifier.dart';
 import 'package:recipe_food/app/presenter/services/auth/auth_service.dart';
 import 'package:recipe_food/app/ui/shared/widgets/custom_toast.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
@@ -43,6 +47,7 @@ class ProfileSettingPageState extends ConsumerState<ProfileSettingPage> {
 
     try {
       await authService.signOut();
+      await ref.read(userProvider.notifier).logout();
       if (mounted) {
         context.router.replaceAll([const LayoutRoute()]);
       }
@@ -156,15 +161,47 @@ class ProfileSettingPageState extends ConsumerState<ProfileSettingPage> {
                   title: "Politica de privacidad",
                   onTap: () {},
                 ),
+                _CustomListTile(
+                  leading: Assets.svgs.notification.svg(
+                    height: 22,
+                  ),
+                  title: "noti",
+                  onTap: () async {
+                    print("noti");
+                    // NotificationController messagingService =
+                    //     ref.read(firebaseMessagingServiceProvider);
+                    // await messagingService.showNotificationWithTextAction(
+                    //     "title notification", "body notification");
+                  },
+                ),
                 Consumer(
                   builder: (context, ref, child) {
                     final notificationsEnabled =
                         ref.watch(notificationProvider);
-                    return Icon(
-                      notificationsEnabled
-                          ? Icons.notifications_active
-                          : Icons.notifications_off,
-                      size: 48,
+                    return InkWell(
+                      onTap: () async {
+                        ref
+                            .read(notificationProvider.notifier)
+                            .requestPermissions();
+                        if (await Permission.notification.isDenied) {
+                          await Permission.storage.request();
+                        }
+                        await FirebaseMessaging.instance.requestPermission(
+                          alert: true,
+                          announcement: false,
+                          badge: true,
+                          carPlay: false,
+                          criticalAlert: false,
+                          provisional: false,
+                          sound: true,
+                        );
+                      },
+                      child: Icon(
+                        notificationsEnabled
+                            ? Icons.notifications_active
+                            : Icons.notifications_off,
+                        size: 48,
+                      ),
                     );
                   },
                 )

@@ -1,1 +1,2 @@
 -keep class androidx.lifecycle.DefaultLifecycleObserver
+-keep class com.delicious_recipes.recipe_food.MyFirebaseMessagingService { *; }

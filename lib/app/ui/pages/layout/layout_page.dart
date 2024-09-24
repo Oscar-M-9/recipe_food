@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use_from_same_package
-
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -8,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:recipe_food/app/config/language/index.dart';
 import 'package:recipe_food/app/config/router/router.gr.dart';
 import 'package:recipe_food/app/presenter/controllers/connectivity_controller.dart';
+import 'package:recipe_food/app/presenter/controllers/notification/notification_permission.dart';
 import 'package:recipe_food/app/presenter/providers/app/profile/user_notifier.dart';
 import 'package:recipe_food/app/ui/pages/recipe/recipe_form_page.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
@@ -57,6 +56,7 @@ class LayoutPageState extends ConsumerState<LayoutPage> {
 
   void verifyPermissions() async {
     await requestNotificationPermission(); // Solicitar el permiso aquí
+    ref.read(notificationPermission.notifier).requestPermissions();
   }
 
   Future<void> requestNotificationPermission() async {
@@ -85,6 +85,7 @@ class LayoutPageState extends ConsumerState<LayoutPage> {
     // Escucha los cambios en el estado de la conectividad
     final connectivityResult = ref.watch(connectivityStatusProvider);
     print("🚗 $connectivityResult");
+    // ref.watch(firebaseMessagingServiceProvider);
 
     return AutoTabsScaffold(
       routes: _routes,
@@ -94,7 +95,7 @@ class LayoutPageState extends ConsumerState<LayoutPage> {
             context,
             MaterialPageRoute(
               // builder: (context) => const AddRecipePage(),
-              builder: (context) => RecipeFormPage(),
+              builder: (context) => const RecipeFormPage(),
             ),
           );
           // context.router.push(AddRecipeRoute());

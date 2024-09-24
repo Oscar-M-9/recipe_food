@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:recipe_food/app/infra/models/user/user_model.dart';
 import 'package:recipe_food/app/presenter/services/profile/profile_service.dart';
 
@@ -17,8 +18,9 @@ class UserNotifier extends StateNotifier<UserModel?> {
     }
   }
 
-  // Método para limpiar los datos (si es necesario en algún punto)
-  void clearUserData() {
+  Future<void> logout() async {
     state = null;
+    var box = await Hive.openBox('user');
+    await box.delete('user');
   }
 }

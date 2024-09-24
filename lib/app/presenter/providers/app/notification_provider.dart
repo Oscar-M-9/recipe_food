@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:recipe_food/app/infra/models/received_notification.dart';
-import 'package:recipe_food/app/presenter/controllers/notification_manager.dart';
 import 'package:riverpod/riverpod.dart';
 
 final notificationProvider =
@@ -57,52 +55,52 @@ class NotificationStateNotifier extends StateNotifier<bool> {
     }
   }
 
-  void configureDidReceiveLocalNotificationSubject() {
-    didReceiveLocalNotificationStream.stream
-        .listen((ReceivedNotificationModel receivedNotification) async {
-      // Tu lógica para manejar las notificaciones recibidas
-      print("🔔 received notification ${receivedNotification.toJson()}");
-      // await showDialog(
-      //   context: context,
-      //   builder: (BuildContext context) => CupertinoAlertDialog(
-      //     title: receivedNotification.title != null
-      //         ? Text(receivedNotification.title!)
-      //         : null,
-      //     content: receivedNotification.body != null
-      //         ? Text(receivedNotification.body!)
-      //         : null,
-      //     actions: <Widget>[
-      //       CupertinoDialogAction(
-      //         isDefaultAction: true,
-      //         onPressed: () async {
-      //           Navigator.of(context, rootNavigator: true).pop();
-      //           await Navigator.of(context).push(
-      //             MaterialPageRoute<void>(
-      //               builder: (BuildContext context) =>
-      //                   SecondPage(receivedNotification.payload),
-      //             ),
-      //           );
-      //         },
-      //         child: const Text('Ok'),
-      //       )
-      //     ],
-      //   ),
-      // );
-    });
-  }
+  // void configureDidReceiveLocalNotificationSubject() {
+  //   didReceiveLocalNotificationStream.stream
+  //       .listen((ReceivedNotificationModel receivedNotification) async {
+  //     // Tu lógica para manejar las notificaciones recibidas
+  //     print("🔔 received notification ${receivedNotification.toJson()}");
+  //     // await showDialog(
+  //     //   context: context,
+  //     //   builder: (BuildContext context) => CupertinoAlertDialog(
+  //     //     title: receivedNotification.title != null
+  //     //         ? Text(receivedNotification.title!)
+  //     //         : null,
+  //     //     content: receivedNotification.body != null
+  //     //         ? Text(receivedNotification.body!)
+  //     //         : null,
+  //     //     actions: <Widget>[
+  //     //       CupertinoDialogAction(
+  //     //         isDefaultAction: true,
+  //     //         onPressed: () async {
+  //     //           Navigator.of(context, rootNavigator: true).pop();
+  //     //           await Navigator.of(context).push(
+  //     //             MaterialPageRoute<void>(
+  //     //               builder: (BuildContext context) =>
+  //     //                   SecondPage(receivedNotification.payload),
+  //     //             ),
+  //     //           );
+  //     //         },
+  //     //         child: const Text('Ok'),
+  //     //       )
+  //     //     ],
+  //     //   ),
+  //     // );
+  //   });
+  // }
 
-  void configureSelectNotificationSubject() {
-    selectNotificationStream.stream.listen((String? payload) async {
-      // Tu lógica para manejar las notificaciones seleccionadas
-      print("🔔 notification payload: $payload");
-      // await Navigator.of(context).push(MaterialPageRoute<void>(
-      //   builder: (BuildContext context) => SecondPage(payload),
-      // ));
-    });
-  }
+  // void configureSelectNotificationSubject() {
+  //   selectNotificationStream.stream.listen((String? payload) async {
+  //     // Tu lógica para manejar las notificaciones seleccionadas
+  //     print("🔔 notification payload: $payload");
+  //     // await Navigator.of(context).push(MaterialPageRoute<void>(
+  //     //   builder: (BuildContext context) => SecondPage(payload),
+  //     // ));
+  //   });
+  // }
 
-  void notificationDispose() {
-    didReceiveLocalNotificationStream.close();
-    selectNotificationStream.close();
-  }
+  // void notificationDispose() {
+  //   didReceiveLocalNotificationStream.close();
+  //   selectNotificationStream.close();
+  // }
 }

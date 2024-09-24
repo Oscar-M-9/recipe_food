@@ -48,8 +48,20 @@ class SignInPageState extends ConsumerState<SignInPage> {
     bool isConnected = await connectivityNotifier.isConnected;
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       if (!isConnected && mounted) {
-        _showToast(
-            text: AppLocalizations.of(context)!.textNoInternetConnection);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.radicalRed500,
+            content: Text(
+              AppLocalizations.of(context)!.textNoInternetConnection,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ),
+        );
+        // _showToast(
+        //     text: AppLocalizations.of(context)!.textNoInternetConnection);
       } else {
         setState(() {
           _isLoading = true;
@@ -98,7 +110,19 @@ class SignInPageState extends ConsumerState<SignInPage> {
 
     bool isConnected = await connectivityNotifier.isConnected;
     if (!isConnected && mounted) {
-      _showToast(text: AppLocalizations.of(context)!.textNoInternetConnection);
+      // _showToast(text: AppLocalizations.of(context)!.textNoInternetConnection);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.radicalRed500,
+          content: Text(
+            AppLocalizations.of(context)!.textNoInternetConnection,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ),
+      );
     } else {
       setState(() {
         _isLoadingGoogle = true;

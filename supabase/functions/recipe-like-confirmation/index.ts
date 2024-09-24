@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
     .select('*')
     .eq('user_id', dataUserRecipe.id);
 
-    console.log("dataUserDevices", dataUserDevices);
+    // console.log("dataUserDevices", dataUserDevices);
 
 
   if (errorUserDevices || !dataUserDevices) {
@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
   }
 
   // const fcmToken = dataUserRecipe!.fcm_token as String
-  console.log("dataUser.id != dataUserRecipe.id", dataUser.id != dataUserRecipe.id);
+  // console.log("dataUser.id != dataUserRecipe.id", dataUser.id != dataUserRecipe.id);
   if (dataUser.id != dataUserRecipe.id){
     const { default: serviceAccount } = await import('../service-account.json', { 
       with : { type: 'json' } 
@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
   
     for (const device of dataUserDevices) {
       const fcmToken = device.fcm_token as String
-      console.log("Fcm token",fcmToken);
+      // console.log("Fcm token",fcmToken);
       
       const res = await fetch(
         `https://fcm.googleapis.com/v1/projects/${project_id}/messages:send`,
@@ -140,18 +140,20 @@ Deno.serve(async (req) => {
       )
   
       const resData = await res.json()
-      console.log("resData ", resData) 
 
       // if (res.status < 200 || 299 < res.status) {
       //   throw resData
       // }
   
       if (res.status < 200 || res.status > 299){
-        // Verificar si el error indica un token inválido
-        if (resData.error && resData.error.message === 'InvalidRegistration') {
-          invalidTokens.push(fcmToken)
-        } else {
-          throw resData
+        // Manejo del error UNREGISTERED
+        if (resData.error && resData.error.details) {
+          const errorDetails = resData.error.details.find(detail => detail.errorCode === 'UNREGISTERED');
+          if (errorDetails) {
+            invalidTokens.push(fcmToken); // Añadir el token no válido a la lista
+          } else {
+            throw resData; // Otros errores no manejados se lanzan como excepción
+          }
         }
       }
       results.push(resData)
@@ -169,7 +171,8 @@ Deno.serve(async (req) => {
       }
     }
   
-  
+    console.log("results ", results) 
+
     return new Response(
       JSON.stringify(results),
       { headers: { "Content-Type": "application/json" } },

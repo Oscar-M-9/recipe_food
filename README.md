@@ -33,8 +33,4 @@ la comunidad y descubre nuevas recetas para inspirarte!
 
 # Demo
 
-| screenrecorder/screenrecorder-2024-09-26-09-59-19-562_AI7XFKDq.mp4                                                                                          |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <video controls src="screenrecorder/screenrecorder-2024-09-26-09-59-19-562_AI7XFKDq.mp4" height="350" title="Vieo de la app de recetas deliciosas"></video> |
-
-<video controls src="screenrecorder/screenrecorder-2024-09-26-09-59-19-562_AI7XFKDq.mp4" height="350" title="Vieo de la app de recetas deliciosas"></video>
+https://github.com/Oscar-M-9/recipe_food/blob/386f9b9682bc2f6a19916f96860d4cb173062835/screenrecorder/Screenrecorder-2024-09-26-09-59-19-562.mp4

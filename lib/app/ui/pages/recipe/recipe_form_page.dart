@@ -207,13 +207,14 @@ class RecipeFormPageState extends ConsumerState<RecipeFormPage> {
         quantity: formData['ingredient_quantity'],
       ));
       if (ingredientsDynamics.isNotEmpty) {
-        ingredientsDynamics.map((item) {
-          return ingredient.add(IngredientModel(
+        ingredientsDynamics.asMap().forEach((idex, item) {
+          ingredient.add(IngredientModel(
             name: item['name'],
             quantity: item['quantity'],
           ));
         });
       }
+
       // Pasos de preparacion
       List<PreparationStepModel> preparationSteps = [];
       preparationSteps.add(PreparationStepModel(

@@ -168,7 +168,7 @@ class ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                       Tab(
                         child: _buildTabItem(
-                          text: AppLocalizations.of(context)!.textCollections,
+                          text: "Guardados",
                           icon: Assets.svgs.bookmark,
                         ),
                       ),

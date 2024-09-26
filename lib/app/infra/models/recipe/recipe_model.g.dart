@@ -41,6 +41,9 @@ _$RecipeModelImpl _$$RecipeModelImplFromJson(Map<String, dynamic> json) =>
       like: (json['like'] as List<dynamic>?)
           ?.map((e) => RecipeLikeModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      saved: json['saved'] == null
+          ? null
+          : SavedRecipeModel.fromJson(json['saved'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$RecipeModelImplToJson(_$RecipeModelImpl instance) =>
@@ -62,4 +65,5 @@ Map<String, dynamic> _$$RecipeModelImplToJson(_$RecipeModelImpl instance) =>
       'images': instance.images,
       'user': instance.user,
       'like': instance.like,
+      'saved': instance.saved,
     };

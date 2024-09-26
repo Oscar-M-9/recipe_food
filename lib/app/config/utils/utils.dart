@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:recipe_food/app/config/language/index.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 
@@ -47,5 +48,13 @@ class AppUtils {
     } else {
       return number.toString();
     }
+  }
+
+  static String formatDate(DateTime date) {
+    // Cargar localización en español
+    final DateFormat formatter = DateFormat("d 'de' MMMM 'del' yyyy", 'es_ES');
+
+    // Formatear la fecha
+    return formatter.format(date);
   }
 }

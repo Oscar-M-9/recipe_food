@@ -1,5 +1,5 @@
-import { createClient } from 'npm:@supabase/supabase-js@2'
-import { JWT } from 'npm:google-auth-library@9'
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { JWT } from "npm:google-auth-library@9";
 
 interface RecipeLike {
   id: number;
@@ -8,115 +8,117 @@ interface RecipeLike {
 }
 
 interface WebhookPayload {
-  type: 'INSERT'
-  table: string
-  record: RecipeLike
-  schema: 'public',
-  old_record: null | RecipeLike
+  type: "INSERT";
+  table: string;
+  record: RecipeLike;
+  schema: "public";
+  old_record: null | RecipeLike;
 }
 
 const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-)
-
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+);
 
 Deno.serve(async (req) => {
-  const payload: WebhookPayload = await req.json()
+  const payload: WebhookPayload = await req.json();
 
-  // Datos del usuario que dio like 
+  // Datos del usuario que dio like
   const { data: dataUser, error: errorUser } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', payload.record.user_id)
+    .from("users")
+    .select("*")
+    .eq("id", payload.record.user_id)
     .single();
   if (errorUser || !dataUser) {
     return new Response(
-      JSON.stringify({ error: 'User not found' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } },
+      JSON.stringify({ error: "User not found" }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 
   // Datos de la receta
   const { data: dataRecipe, error: errorRecipe } = await supabase
-    .from('recipes')
-    .select('*')
-    .eq('id', payload.record.recipe_id)
+    .from("recipes")
+    .select("*")
+    .eq("id", payload.record.recipe_id)
     .single();
 
   if (errorRecipe || !dataRecipe) {
     return new Response(
-      JSON.stringify({ error: 'Recipe not found' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } },
+      JSON.stringify({ error: "Recipe not found" }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 
   // Datos del usuario de la receta
   const { data: dataUserRecipe, error: errorUserRecipe } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', dataRecipe.user_id)  // Asegúrate de que dataRecipe tiene user_id
+    .from("users")
+    .select("*")
+    .eq("id", dataRecipe.user_id) // Asegúrate de que dataRecipe tiene user_id
     .single();
 
   if (errorUserRecipe || !dataUserRecipe) {
     return new Response(
-      JSON.stringify({ error: 'Recipe user not found' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } },
+      JSON.stringify({ error: "Recipe user not found" }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 
   // Datos de los user_devices obteniendo los fcmTokens del usuario
   const { data: dataUserDevices, error: errorUserDevices } = await supabase
-    .from('user_devices')
-    .select('*')
-    .eq('user_id', dataUserRecipe.id);
+    .from("user_devices")
+    .select("*")
+    .eq("user_id", dataUserRecipe.id);
 
-    // console.log("dataUserDevices", dataUserDevices);
-
+  // console.log("dataUserDevices", dataUserDevices);
 
   if (errorUserDevices || !dataUserDevices) {
     return new Response(
-      JSON.stringify({ error: 'Devices user not found' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } },
+      JSON.stringify({ error: "Devices user not found" }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 
   // const fcmToken = dataUserRecipe!.fcm_token as String
   // console.log("dataUser.id != dataUserRecipe.id", dataUser.id != dataUserRecipe.id);
-  if (dataUser.id != dataUserRecipe.id){
-    const { default: serviceAccount } = await import('../service-account.json', { 
-      with : { type: 'json' } 
-    })
-  
+  if (dataUser.id != dataUserRecipe.id) {
+    const { default: serviceAccount } = await import(
+      "../service-account.json",
+      {
+        with: { type: "json" },
+      }
+    );
+
     const accessToken = await getAccessToken({
       clientEmail: serviceAccount.client_email,
       privateKey: serviceAccount.private_key,
-    })
-  
-    const project_id = serviceAccount.project_id
-  
-    const invalidTokens : string[] = []
+    });
 
-    const results = []
-  
+    const project_id = serviceAccount.project_id;
+
+    const invalidTokens: string[] = [];
+
+    const results = [];
+
     for (const device of dataUserDevices) {
-      const fcmToken = device.fcm_token as String
+      const fcmToken = device.fcm_token as String;
       // console.log("Fcm token",fcmToken);
-      
+
       const res = await fetch(
         `https://fcm.googleapis.com/v1/projects/${project_id}/messages:send`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             message: {
               token: fcmToken,
               notification: {
                 title: `${dataUser.name} le a gustado tu receta`,
-                body: `¡${dataUser.name} le ha dado like a tu receta ${dataRecipe.title}!`,
+                body:
+                  `¡${dataUser.name} le ha dado like a tu receta ${dataRecipe.title}!`,
               },
               data: {
                 recipe_id: payload.record.recipe_id,
@@ -124,31 +126,33 @@ Deno.serve(async (req) => {
               },
               android: {
                 notification: {
-                  sound: 'default',  // Definir el sonido aquí para Android
+                  sound: "default", // Definir el sonido aquí para Android
                 },
               },
               apns: {
                 payload: {
                   aps: {
-                    sound: 'default',  // Definir el sonido aquí para iOS
+                    sound: "default", // Definir el sonido aquí para iOS
                   },
                 },
               },
             },
           }),
-        }
-      )
-  
-      const resData = await res.json()
+        },
+      );
+
+      const resData = await res.json();
 
       // if (res.status < 200 || 299 < res.status) {
       //   throw resData
       // }
-  
-      if (res.status < 200 || res.status > 299){
+
+      if (res.status < 200 || res.status > 299) {
         // Manejo del error UNREGISTERED
         if (resData.error && resData.error.details) {
-          const errorDetails = resData.error.details.find(detail => detail.errorCode === 'UNREGISTERED');
+          const errorDetails = resData.error.details.find((detail) =>
+            detail.errorCode === "UNREGISTERED"
+          );
           if (errorDetails) {
             invalidTokens.push(fcmToken); // Añadir el token no válido a la lista
           } else {
@@ -156,61 +160,61 @@ Deno.serve(async (req) => {
           }
         }
       }
-      results.push(resData)
+      results.push(resData);
     }
-  
+
     // Eliminar tokens inválidos de supabase
-    if (invalidTokens.length > 0){
+    if (invalidTokens.length > 0) {
       const { data: dataDeleted, error: errorDeleted } = await supabase
-        .from('user_devices')
+        .from("user_devices")
         .delete()
-        .in('fcm_token', invalidTokens)
-  
+        .in("fcm_token", invalidTokens);
+
       if (errorDeleted) {
-        console.error('Error al eliminar tokens inválidos:', errorDeleted)
+        console.error("Error al eliminar tokens inválidos:", errorDeleted);
       }
     }
-  
-    console.log("results ", results) 
+
+    console.log("results ", results);
 
     return new Response(
       JSON.stringify(results),
       { headers: { "Content-Type": "application/json" } },
-    )
+    );
   }
-  console.log("no se le puede enviar notificacion a si mismo")
+  console.log("no se le puede enviar notificacion a si mismo");
 
   return new Response(
-    JSON.stringify({message: "no se le puede enviar notificacion a si mismo"}),
+    JSON.stringify({
+      message: "no se le puede enviar notificacion a si mismo",
+    }),
     { headers: { "Content-Type": "application/json" } },
-  )
-  
-})
+  );
+});
 
 const getAccessToken = ({
   clientEmail,
   privateKey,
-} : {
-  clientEmail: string,
-  privateKey: string,
-}): Promise<string> => { 
+}: {
+  clientEmail: string;
+  privateKey: string;
+}): Promise<string> => {
   return new Promise((resolve, reject) => {
     const jwtClient = new JWT({
       email: clientEmail,
       key: privateKey,
-      scopes: ['https://www.googleapis.com/auth/firebase.messaging'],
-    })
+      scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
+    });
     jwtClient.authorize((err, tokens) => {
       if (err) {
-        reject(err)
+        reject(err);
         return;
       }
-      
-      resolve(tokens!.access_token!)
-    
-    })
-  })
-}
+
+      resolve(tokens!.access_token!);
+    });
+  });
+};
 
 /* To invoke locally:
 

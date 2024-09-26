@@ -477,40 +477,40 @@ class _SearchPageState extends State<SearchPage> {
             ),
             //* recipes
             // title recetas
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          "Recetas",
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
-                  ),
-                  // publicaciones de la receta
-                ],
-              ),
-            ),
+            // SliverToBoxAdapter(
+            //   child: Column(
+            //     children: [
+            //       Padding(
+            //         padding: const EdgeInsets.symmetric(
+            //           horizontal: 10,
+            //           vertical: 8,
+            //         ),
+            //         child: Row(
+            //           children: [
+            //             Text(
+            //               "Recetas",
+            //               style: theme.textTheme.titleLarge?.copyWith(
+            //                 fontWeight: FontWeight.bold,
+            //               ),
+            //             ),
+            //             const Spacer(),
+            //           ],
+            //         ),
+            //       ),
+            //       // publicaciones de la receta
+            //     ],
+            //   ),
+            // ),
             // publicaciones de la receta
-            SliverList.builder(
-              itemBuilder: (context, index) {
-                return PublicationRecipe(
-                  keyImageHero: "image_search_$index",
-                  recipe: RecipeModel(),
-                  user: UserModel(),
-                );
-              },
-            ),
+            // SliverList.builder(
+            //   itemBuilder: (context, index) {
+            //     return PublicationRecipe(
+            //       keyImageHero: "image_search_$index",
+            //       recipe: RecipeModel(),
+            //       user: UserModel(),
+            //     );
+            //   },
+            // ),
             const SliverToBoxAdapter(
               child: SizedBox(height: 90),
             )

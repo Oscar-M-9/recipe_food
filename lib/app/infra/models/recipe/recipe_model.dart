@@ -6,6 +6,7 @@ import 'package:recipe_food/app/infra/models/recipe/ingredients/ingredient_model
 import 'package:recipe_food/app/infra/models/recipe/preparation_steps/preparation_step_model.dart';
 import 'package:recipe_food/app/infra/models/recipe/recipe_image/recipe_image_model.dart';
 import 'package:recipe_food/app/infra/models/recipe/recipe_like/recipe_like_model.dart';
+import 'package:recipe_food/app/infra/models/saved_recipe/saved_recipe_model.dart';
 import 'package:recipe_food/app/infra/models/user/user_model.dart';
 
 part 'recipe_model.freezed.dart';
@@ -32,6 +33,7 @@ abstract class RecipeModel with _$RecipeModel {
     List<RecipeImageModel>? images,
     UserModel? user,
     List<RecipeLikeModel>? like,
+    SavedRecipeModel? saved,
   }) = _RecipeModel;
   factory RecipeModel.fromJson(Map<String, dynamic> json) =>
       _$RecipeModelFromJson(json);

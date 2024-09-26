@@ -53,7 +53,7 @@ class _AllRecipeScreenState extends State<AllRecipeScreen>
   Widget build(BuildContext context) {
     super.build(context);
     return ExtendedVisibilityDetector(
-      uniqueKey: const PageStorageKey<String>('tab-all-recipe-profile'),
+      uniqueKey: recipeTabKey,
       child: RefreshIndicator(
         onRefresh: _refreshRecipes,
         child: LoadingMoreList<RecipeModel>(

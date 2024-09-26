@@ -158,47 +158,49 @@ class _PublicationDetailRecipeState extends State<PublicationDetailRecipe> {
                 ),
               ),
               // !! Creador
-              if (widget.isAuthor)
-                ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: widget.recipe.user?.avatar_url != null
-                        ? CachedNetworkImageProvider(
-                            widget.recipe.user!.avatar_url!)
-                        : Assets.images.blankProfilePicture.provider(),
-                    radius: 25,
-                  ),
-                  title: Text(
-                    widget.recipe.user?.name ?? "-----",
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(
-                    "${AppUtils.formatLargeNumber(_userStats?.followersCount ?? 0)} ${AppLocalizations.of(context)!.textFollowers}",
-                    style: textTheme.bodyMedium,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: ElevatedButton(
-                    onPressed: () {},
-                    style: ButtonStyle(
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      AppLocalizations.of(context)!.textFollow,
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: widget.recipe.user?.avatar_url != null
+                      ? CachedNetworkImageProvider(
+                          widget.recipe.user!.avatar_url!)
+                      : Assets.images.blankProfilePicture.provider(),
+                  radius: 25,
                 ),
+                title: Text(
+                  widget.recipe.user?.name ?? "-----",
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  "${AppUtils.formatLargeNumber(_userStats?.followersCount ?? 0)} ${AppLocalizations.of(context)!.textFollowers}",
+                  style: textTheme.bodyMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: widget.isAuthor
+                    ? ElevatedButton(
+                        onPressed: () {},
+                        style: ButtonStyle(
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context)!.textFollow,
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : const SizedBox(),
+              ),
               const SizedBox(height: 15),
               // !! Dificultad de la receta
               Row(

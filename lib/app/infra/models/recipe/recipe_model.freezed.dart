@@ -38,6 +38,7 @@ mixin _$RecipeModel {
   List<RecipeImageModel>? get images => throw _privateConstructorUsedError;
   UserModel? get user => throw _privateConstructorUsedError;
   List<RecipeLikeModel>? get like => throw _privateConstructorUsedError;
+  SavedRecipeModel? get saved => throw _privateConstructorUsedError;
 
   /// Serializes this RecipeModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -72,10 +73,12 @@ abstract class $RecipeModelCopyWith<$Res> {
       List<PreparationStepModel>? steps,
       List<RecipeImageModel>? images,
       UserModel? user,
-      List<RecipeLikeModel>? like});
+      List<RecipeLikeModel>? like,
+      SavedRecipeModel? saved});
 
   $CategorieModelCopyWith<$Res>? get categorie;
   $UserModelCopyWith<$Res>? get user;
+  $SavedRecipeModelCopyWith<$Res>? get saved;
 }
 
 /// @nodoc
@@ -110,6 +113,7 @@ class _$RecipeModelCopyWithImpl<$Res, $Val extends RecipeModel>
     Object? images = freezed,
     Object? user = freezed,
     Object? like = freezed,
+    Object? saved = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -180,6 +184,10 @@ class _$RecipeModelCopyWithImpl<$Res, $Val extends RecipeModel>
           ? _value.like
           : like // ignore: cast_nullable_to_non_nullable
               as List<RecipeLikeModel>?,
+      saved: freezed == saved
+          ? _value.saved
+          : saved // ignore: cast_nullable_to_non_nullable
+              as SavedRecipeModel?,
     ) as $Val);
   }
 
@@ -210,6 +218,20 @@ class _$RecipeModelCopyWithImpl<$Res, $Val extends RecipeModel>
       return _then(_value.copyWith(user: value) as $Val);
     });
   }
+
+  /// Create a copy of RecipeModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SavedRecipeModelCopyWith<$Res>? get saved {
+    if (_value.saved == null) {
+      return null;
+    }
+
+    return $SavedRecipeModelCopyWith<$Res>(_value.saved!, (value) {
+      return _then(_value.copyWith(saved: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -237,12 +259,15 @@ abstract class _$$RecipeModelImplCopyWith<$Res>
       List<PreparationStepModel>? steps,
       List<RecipeImageModel>? images,
       UserModel? user,
-      List<RecipeLikeModel>? like});
+      List<RecipeLikeModel>? like,
+      SavedRecipeModel? saved});
 
   @override
   $CategorieModelCopyWith<$Res>? get categorie;
   @override
   $UserModelCopyWith<$Res>? get user;
+  @override
+  $SavedRecipeModelCopyWith<$Res>? get saved;
 }
 
 /// @nodoc
@@ -275,6 +300,7 @@ class __$$RecipeModelImplCopyWithImpl<$Res>
     Object? images = freezed,
     Object? user = freezed,
     Object? like = freezed,
+    Object? saved = freezed,
   }) {
     return _then(_$RecipeModelImpl(
       id: freezed == id
@@ -345,6 +371,10 @@ class __$$RecipeModelImplCopyWithImpl<$Res>
           ? _value._like
           : like // ignore: cast_nullable_to_non_nullable
               as List<RecipeLikeModel>?,
+      saved: freezed == saved
+          ? _value.saved
+          : saved // ignore: cast_nullable_to_non_nullable
+              as SavedRecipeModel?,
     ));
   }
 }
@@ -369,7 +399,8 @@ class _$RecipeModelImpl implements _RecipeModel {
       final List<PreparationStepModel>? steps,
       final List<RecipeImageModel>? images,
       this.user,
-      final List<RecipeLikeModel>? like})
+      final List<RecipeLikeModel>? like,
+      this.saved})
       : _ingredients = ingredients,
         _steps = steps,
         _images = images,
@@ -446,8 +477,11 @@ class _$RecipeModelImpl implements _RecipeModel {
   }
 
   @override
+  final SavedRecipeModel? saved;
+
+  @override
   String toString() {
-    return 'RecipeModel(id: $id, user_id: $user_id, title: $title, short_description: $short_description, cooking_time: $cooking_time, difficulty: $difficulty, calories: $calories, servings: $servings, categorie_id: $categorie_id, created_at: $created_at, updated_at: $updated_at, categorie: $categorie, ingredients: $ingredients, steps: $steps, images: $images, user: $user, like: $like)';
+    return 'RecipeModel(id: $id, user_id: $user_id, title: $title, short_description: $short_description, cooking_time: $cooking_time, difficulty: $difficulty, calories: $calories, servings: $servings, categorie_id: $categorie_id, created_at: $created_at, updated_at: $updated_at, categorie: $categorie, ingredients: $ingredients, steps: $steps, images: $images, user: $user, like: $like, saved: $saved)';
   }
 
   @override
@@ -481,7 +515,8 @@ class _$RecipeModelImpl implements _RecipeModel {
             const DeepCollectionEquality().equals(other._steps, _steps) &&
             const DeepCollectionEquality().equals(other._images, _images) &&
             (identical(other.user, user) || other.user == user) &&
-            const DeepCollectionEquality().equals(other._like, _like));
+            const DeepCollectionEquality().equals(other._like, _like) &&
+            (identical(other.saved, saved) || other.saved == saved));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -504,7 +539,8 @@ class _$RecipeModelImpl implements _RecipeModel {
       const DeepCollectionEquality().hash(_steps),
       const DeepCollectionEquality().hash(_images),
       user,
-      const DeepCollectionEquality().hash(_like));
+      const DeepCollectionEquality().hash(_like),
+      saved);
 
   /// Create a copy of RecipeModel
   /// with the given fields replaced by the non-null parameter values.
@@ -540,7 +576,8 @@ abstract class _RecipeModel implements RecipeModel {
       final List<PreparationStepModel>? steps,
       final List<RecipeImageModel>? images,
       final UserModel? user,
-      final List<RecipeLikeModel>? like}) = _$RecipeModelImpl;
+      final List<RecipeLikeModel>? like,
+      final SavedRecipeModel? saved}) = _$RecipeModelImpl;
 
   factory _RecipeModel.fromJson(Map<String, dynamic> json) =
       _$RecipeModelImpl.fromJson;
@@ -579,6 +616,8 @@ abstract class _RecipeModel implements RecipeModel {
   UserModel? get user;
   @override
   List<RecipeLikeModel>? get like;
+  @override
+  SavedRecipeModel? get saved;
 
   /// Create a copy of RecipeModel
   /// with the given fields replaced by the non-null parameter values.

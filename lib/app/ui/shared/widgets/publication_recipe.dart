@@ -5,18 +5,20 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:like_button/like_button.dart';
+import 'package:recipe_food/app/config/app_colors.dart';
 import 'package:recipe_food/app/config/language/index.dart';
 import 'package:recipe_food/app/config/utils/utils.dart';
 import 'package:recipe_food/app/infra/models/recipe/recipe_model.dart';
 import 'package:recipe_food/app/infra/models/user/user_model.dart';
 import 'package:recipe_food/app/presenter/services/recipe/recipe_service.dart';
+import 'package:recipe_food/app/presenter/services/saved_recipe/saved_recipe_service.dart';
 import 'package:recipe_food/app/ui/pages/layout/home/widgets/divider_vertical.dart';
 import 'package:recipe_food/app/ui/pages/layout/home/widgets/icon_text.dart';
 import 'package:recipe_food/app/ui/shared/widgets/expandable_text.dart';
 import 'package:recipe_food/app/ui/shared/widgets/publication_detail_recipe.dart';
 import 'package:recipe_food/gen/assets.gen.dart';
 
-class PublicationRecipe extends StatelessWidget {
+class PublicationRecipe extends StatefulWidget {
   const PublicationRecipe({
     super.key,
     required this.keyImageHero,
@@ -28,25 +30,46 @@ class PublicationRecipe extends StatelessWidget {
   final UserModel user;
 
   @override
+  State<PublicationRecipe> createState() => _PublicationRecipeState();
+}
+
+class _PublicationRecipeState extends State<PublicationRecipe> {
+  Future<bool> onLikeButtonTapped(bool isLiked) async {
+    final recipeService = RecipeService();
+    var box = await Hive.openBox('user');
+    var user = box.get('user') as UserModel;
+
+    if (!isLiked) {
+      await recipeService.likeRecipe(widget.recipe.id!, user.id!);
+    } else {
+      await recipeService.unLikeRecipe(widget.recipe.id!, user.id!);
+    }
+
+    return !isLiked;
+  }
+
+  bool isAuthor() {
+    if (widget.user.id == widget.recipe.user?.id) {
+      return true;
+    }
+    return false;
+  }
+
+  bool isSaved = false;
+
+  @override
+  void initState() {
+    setState(() {
+      widget.recipe.saved?.user_id == widget.user.id
+          ? isSaved = true
+          : isSaved = false;
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    Future<bool> onLikeButtonTapped(bool isLiked) async {
-      final recipeService = RecipeService();
-      var box = await Hive.openBox('user');
-      var user = box.get('user') as UserModel;
-
-      /// send your request here
-      if (!isLiked) {
-        await recipeService.likeRecipe(recipe.id!, user.id!);
-      } else {
-        await recipeService.unLikeRecipe(recipe.id!, user.id!);
-      }
-
-      /// if failed, you can do nothing
-      // return success? !isLiked:isLiked;
-
-      return !isLiked;
-    }
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -62,8 +85,9 @@ class PublicationRecipe extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                backgroundImage: recipe.user?.avatar_url != null
-                    ? CachedNetworkImageProvider(recipe.user!.avatar_url!)
+                backgroundImage: widget.recipe.user?.avatar_url != null
+                    ? CachedNetworkImageProvider(
+                        widget.recipe.user!.avatar_url!)
                     : Assets.images.blankProfilePicture.provider(),
                 radius: 16,
               ),
@@ -73,26 +97,26 @@ class PublicationRecipe extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AutoSizeText(
-                      recipe.user?.name ?? "-----",
+                      widget.recipe.user?.name ?? "-----",
                       style: theme.textTheme.titleSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    // AutoSizeText(
-                    //   "By Roberta Anny",
-                    //   style: theme.textTheme.bodySmall,
-                    //   maxLines: 1,
-                    //   overflow: TextOverflow.ellipsis,
-                    // ),
+                    AutoSizeText(
+                      "Publicado: ${AppUtils.formatDate(widget.recipe.created_at!)}",
+                      style: theme.textTheme.bodySmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () {
-                  // opcion guardar y denunciar como en instagram
-                },
-                icon: const Icon(Icons.more_vert_rounded),
-              ),
+              // IconButton(
+              //   onPressed: () {
+              //     // opcion guardar y denunciar como en instagram
+              //   },
+              //   icon: const Icon(Icons.more_vert_rounded),
+              // ),
             ],
           ),
 
@@ -104,8 +128,9 @@ class PublicationRecipe extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => PublicationDetailRecipe(
-                    keyImageHero: keyImageHero,
-                    recipe: recipe,
+                    keyImageHero: widget.keyImageHero,
+                    recipe: widget.recipe,
+                    isAuthor: !isAuthor(),
                   ),
                 ),
               );
@@ -114,14 +139,14 @@ class PublicationRecipe extends StatelessWidget {
               children: [
                 // imagen de la receta
                 Hero(
-                  tag: keyImageHero,
+                  tag: widget.keyImageHero,
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 200),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(5),
-                      child: recipe.images!.isNotEmpty
+                      child: widget.recipe.images!.isNotEmpty
                           ? CachedNetworkImage(
-                              imageUrl: recipe.images!.first.image_url!,
+                              imageUrl: widget.recipe.images!.first.image_url!,
                               fit: BoxFit.contain,
                               progressIndicatorBuilder:
                                   (context, url, downloadProgress) => Center(
@@ -169,7 +194,7 @@ class PublicationRecipe extends StatelessWidget {
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: AutoSizeText(
-                              recipe.title ?? "-----",
+                              widget.recipe.title ?? "-----",
                               maxLines: 2,
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
@@ -183,20 +208,20 @@ class PublicationRecipe extends StatelessWidget {
                           children: [
                             IconText(
                               svgPath: Assets.svgs.time.path,
-                              text: "${recipe.cooking_time ?? 00} min",
+                              text: "${widget.recipe.cooking_time ?? 00} min",
                             ),
                             const DividerVertical(),
                             IconText(
                               svgPath: AppUtils.getDifficultySvgPath(
-                                  recipe.difficulty),
+                                  widget.recipe.difficulty),
                               text: AppUtils.getDifficultyText(
-                                  context, recipe.difficulty),
+                                  context, widget.recipe.difficulty),
                             ),
 
                             const DividerVertical(),
                             IconText(
                               svgPath: Assets.svgs.serveAlt.path,
-                              text: "${recipe.servings ?? 00}",
+                              text: "${widget.recipe.servings ?? 00}",
                             ),
                             // IconText(
                             //   svgPath: Assets.svgs.fire.path,
@@ -217,7 +242,7 @@ class PublicationRecipe extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: ExpandableText(
-              text: recipe.short_description ?? "",
+              text: widget.recipe.short_description ?? "",
               trimLength: (MediaQuery.of(context).size.width * 0.6).toInt(),
             ),
           ),
@@ -230,13 +255,13 @@ class PublicationRecipe extends StatelessWidget {
               // like -> me gustas
               LikeButton(
                 // size: 40.0,
-                likeCount: recipe.like?.length ?? 0,
+                likeCount: widget.recipe.like?.length ?? 0,
                 key: GlobalKey<LikeButtonState>(),
-                isLiked: recipe.like
+                isLiked: widget.recipe.like
                         ?.map(
                           (e) => e.user_id,
                         )
-                        .contains(user.id!) ??
+                        .contains(widget.user.id!) ??
                     false,
                 // postFrameCallback: (LikeButtonState state) {
                 //   state.controller?.forward();
@@ -300,7 +325,7 @@ class PublicationRecipe extends StatelessWidget {
               //   "14,2k",
               //   style: theme.textTheme.titleMedium,
               // ),
-              const SizedBox(width: 8),
+              // const SizedBox(width: 8),
               // // comentarios
               // Assets.svgs.commentAltLines.svg(height: 28),
               // const SizedBox(width: 2),
@@ -318,8 +343,54 @@ class PublicationRecipe extends StatelessWidget {
               // ),
               const Spacer(),
               // guardar
-              Assets.svgs.bookmark.svg(
-                height: 20,
+              IconButton(
+                icon: Assets.svgs.bookmark.svg(
+                  height: 20,
+                  color: isSaved ? AppColors.visVis500 : theme.iconTheme.color,
+                ),
+                onPressed: () {
+                  final savedRecipeService = SavedRecipeService();
+                  if (!isSaved) {
+                    savedRecipeService.insert(
+                        widget.recipe.id!, widget.user.id!);
+                    setState(() {
+                      isSaved = true;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: AppColors.jade500,
+                        content: Text(
+                          "Se a guardado a tu colección",
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    savedRecipeService.delete(
+                        widget.recipe.id!, widget.user.id!);
+                    setState(() {
+                      isSaved = false;
+                    });
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: AppColors.dodgetBlue500,
+                        content: Text(
+                          "Se a quitado de tu colección",
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                        ),
+                      ),
+                    );
+                  }
+                },
               ),
             ],
           )

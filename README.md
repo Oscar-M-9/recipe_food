@@ -1,41 +1,35 @@
-# recipe_food
+# Recetas Deliciosas
 
-A new Flutter project.
+Descripción Recetas Deliciosas es una aplicación móvil que te permite publicar,
+seguir y guardar tus recetas favoritas. ¡Comparte tus creaciones culinarias con
+la comunidad y descubre nuevas recetas para inspirarte!
 
-## Getting Started
+## Características
 
-````
-- const int notificationId = 1;
+- **Publica tus recetas:** Comparte tus recetas favoritas con la comunidad y
+  recibe likes.
+- **Sigue a chefs:** Descubre nuevos chefs y recetas y sigue a tus favoritos
+  para estar al tanto de sus últimas creaciones.
+- **Guarda recetas:** Guarda tus recetas favoritas en tu dispositivo móvil y
+  accede a ellas en cualquier momento.
+- **Notificaciones:** Recibe notificaciones cuando alguien le da like a tu
+  receta publicada.
 
-AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'progress_channel',
-      'Progress Notification',
-      channelDescription: 'Shows the progress of an ongoing task.',
-      importance: Importance.high,
-      priority: Priority.high,
-      onlyAlertOnce: true,
-      showProgress: true,
-      maxProgress: maxProgress,
-      indeterminate: false,
-      icon: 'drawable/ic_notification', 
-    );
-````
+## Funcionalidades
 
-para la notificaion de carga al agregar una receta.
+- **Perfil de usuario:** Crea tu perfil y muestra tus recetas publicadas,
+  seguidores y recetas guardadas.
+- **Búsqueda de recetas:** Busca recetas por ingredientes, categorías o nombre.
+- **Fotos y videos:** Agrega fotos y videos a tus recetas para hacerlas más
+  atractivas.
+- **Likes:** Comenta y da like a las recetas de otros usuarios.
 
+## Tecnologías utilizadas
 
+- **Flutter:** Desarrollado con Flutter para una experiencia de usuario suave y
+  atractiva.
+- **Supabase:** Utiliza Supabase para almacenar y gestionar las recetas y
+  usuarios.
 
-----
-
-````
-AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'completion_channel',
-      'Completion Notification',
-      channelDescription: 'Notifica cuando la tarea ha finalizado.',
-      importance: Importance.high,
-      priority: Priority.high,
-      icon: 'drawable/ic_notification',
-    );
-````
+| <video controls src="screenrecorder/Screenrecorder-2024-09-26-09-59-19-562.mp4" title="demo de la app recetas deliciosas" height="350"></video> |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- |

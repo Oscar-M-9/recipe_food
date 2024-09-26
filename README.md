@@ -33,4 +33,4 @@ la comunidad y descubre nuevas recetas para inspirarte!
 
 # Demo
 
-https://github.com/Oscar-M-9/recipe_food/blob/386f9b9682bc2f6a19916f96860d4cb173062835/screenrecorder/Screenrecorder-2024-09-26-09-59-19-562.mp4
+https://github.com/user-attachments/assets/2ddb1706-9172-4837-8976-0ce077609bc7

@@ -31,5 +31,10 @@ la comunidad y descubre nuevas recetas para inspirarte!
 - **Supabase:** Utiliza Supabase para almacenar y gestionar las recetas y
   usuarios.
 
-| <video controls src="screenrecorder/Screenrecorder-2024-09-26-09-59-19-562.mp4" title="demo de la app recetas deliciosas" height="350"></video> |
-| ----------------------------------------------------------------------------------------------------------------------------------------------- |
+# Demo
+
+| screenrecorder/screenrecorder-2024-09-26-09-59-19-562_AI7XFKDq.mp4                                                                                          |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <video controls src="screenrecorder/screenrecorder-2024-09-26-09-59-19-562_AI7XFKDq.mp4" height="350" title="Vieo de la app de recetas deliciosas"></video> |
+
+<video controls src="screenrecorder/screenrecorder-2024-09-26-09-59-19-562_AI7XFKDq.mp4" height="350" title="Vieo de la app de recetas deliciosas"></video>
